@@ -47,6 +47,9 @@
 <script>
 export default {
   name: "userPage",
+  mounted() {
+    //調用user資料
+  },
 };
 </script>
 

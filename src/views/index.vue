@@ -13,7 +13,7 @@
       </template>
     </van-nav-bar>
     <!-- tab欄 -->
-    <van-tabs v-model="activeTab" color="#18A999" animated swipeable>
+    <van-tabs v-model="activeTab" color="#18A999" animated swipeable sticky>
       <van-tab title="香氛蠟燭" name="a">
         <!-- 輪播圖 -->
         <van-swipe :autoplay="3000" class="carousell">

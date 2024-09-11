@@ -1,10 +1,7 @@
 <template>
   <div class="cart">
     <!-- 頂部 nav -->
-    <van-nav-bar
-      :title="`購物車(${list.length})`"
-      fixed
-    >
+    <van-nav-bar :title="`購物車(${list.length})`" fixed>
       <template #left>
         <van-icon name="arrow-left" size="18" @click="$router.go(-1)" />
       </template>
