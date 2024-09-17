@@ -1,10 +1,19 @@
 import request from "@/utils/request";
 
 // --------- 前台 --------------
-// 註冊
+// 註冊（data包含帳號、密碼、電子信箱）
 export const registerAPI = (data) => {
   return request({
     url: "/register",
+    method: "POST",
+    data,
+  });
+};
+
+// 驗證碼
+export const verificationCodeAPI = (data) => {
+  return request({
+    url: "/verificationCode",
     method: "POST",
     data,
   });

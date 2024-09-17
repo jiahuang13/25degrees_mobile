@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 創建實例
 const instance = axios.create({
-  baseURL: "https://www.server.jiahuangtw.site",
+  baseURL: "http://localhost:3008",
   timeout: 5000,
 });
 

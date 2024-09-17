@@ -25,6 +25,9 @@
         >
       </div>
     </van-form>
+    <p class="text">
+      還沒有帳號？點我 <span @click="$router.push('/register')">註冊</span>
+    </p>
   </div>
 </template>
 
@@ -46,7 +49,7 @@ export default {
     async submit() {
       const res = await loginAPI(this.form);
       console.log(res);
-      if (res.data.status === 0) {
+      if (res.data.status === 200) {
         this.$toast.success("登入成功，正在跳轉...");
         setToken(res.token);
         this.$router.push("/");
@@ -62,6 +65,15 @@ export default {
 </script>
 
 <style>
+.login {
+  .text {
+    font-size: 14px;
+    text-align: center;
+    span {
+      border-bottom: 1px solid;
+    }
+  }
+}
 .fail-toast {
   max-width: 30%;
 }
