@@ -15,7 +15,7 @@
           fit="cover"
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8QpKHeBbrELrNRa-63gDAsBM2TQR3GzSxCYwMw73LVw&shttps://t3.ftcdn.net/jpg/03/58/90/78/360_F_358907879_Vdu96gF4XVhjCZxN2kCG0THTsSQi8IhT.jpg"
         />
-        <p>Jialy Cat</p>
+        <p>{{ username }}</p>
       </div>
       <van-icon name="chat-o" dot color="#fff" size="18" />
     </div>
@@ -45,10 +45,19 @@
 </template>
 
 <script>
+import { getUserAPI } from "@/api/user";
 export default {
   name: "userPage",
-  mounted() {
+  data() {
+    return {
+      username: "",
+    };
+  },
+  async mounted() {
     //調用user資料
+    const res = await getUserAPI();
+    // console.log(res.data.username);
+    this.username = res.data.username;
   },
 };
 </script>

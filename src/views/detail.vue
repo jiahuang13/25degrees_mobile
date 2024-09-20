@@ -160,7 +160,8 @@ export default {
   async mounted() {
     // console.log(this.$route.params);
     const res = await getOneProductAPI(this.$route.params.id);
-    this.item = res.data.data;
+    // console.log(res);
+    this.item = res.data;
     // console.log(this.item);
     await this.facebookSDK();
     this.sdkLoaded = true;

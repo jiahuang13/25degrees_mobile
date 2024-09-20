@@ -85,7 +85,9 @@ export default {
   },
   async mounted() {
     const res = await getAllProductAPI();
-    const data = res.data.data;
+    const data = res.data;
+    // console.log(res);
+
     this.incenseList = data.filter((ele) => ele.category === "4");
     this.bodyList = data.filter((ele) => ele.category === "2");
     this.faceList = data.filter((ele) => ele.category === "3");

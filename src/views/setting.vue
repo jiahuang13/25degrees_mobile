@@ -21,16 +21,35 @@
         <van-cell title="我的地址" is-link @click="$router.push('/address')" />
         <van-cell title="銀行/信用卡" is-link />
       </van-cell-group>
-      <van-cell-group title="分组2">
-        <van-cell title="单元格" value="内容" />
+      <van-cell-group>
+        <van-cell title="登出" @click="logout" />
       </van-cell-group>
     </div>
   </div>
 </template>
 
 <script>
+import { removeToken } from "@/utils/auth";
 export default {
   name: "settingPage",
+  methods: {
+    logout() {
+      this.$dialog
+        .confirm({
+          message: "確認登出嗎？",
+          confirmButtonText: "確定",
+          cancelButtonText: "取消",
+        })
+        .then(() => {
+          removeToken();
+          this.$toast.success("登出成功");
+          this.$router.push("/home");
+        })
+        .catch(() => {
+          console.log("取消登出");
+        });
+    },
+  },
 };
 </script>
 

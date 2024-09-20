@@ -11,16 +11,49 @@
         />
       </template>
     </van-nav-bar>
-    <div class="form">
-      <van-field type="text" v-model="obj.name" placeholder="全名" required />
-      <van-field type="tel" v-model="obj.tel" placeholder="手機號碼" required />
+    <van-form
+      class="form"
+      validate-trigger="onBlur"
+      validate-first
+      @submit="submit"
+    >
+      <van-field
+        type="text"
+        v-model="obj.recipient_name"
+        placeholder="收貨人"
+        required
+        :rules="[
+          {
+            required: true,
+            message: '請填寫收貨人',
+          },
+        ]"
+      />
+      <van-field
+        type="tel"
+        v-model="obj.phone"
+        placeholder="手機號碼"
+        required
+        :rules="[
+          {
+            pattern: /^09\d{8}$/,
+            message: '請輸入正確手機格式',
+          },
+        ]"
+      />
       <van-field
         v-model="obj.city"
         is-link
         readonly
         required
-        placeholder="城市，區"
+        placeholder="城市，鄉鎮地區"
         @click="show = true"
+        :rules="[
+          {
+            required: true,
+            message: '請選擇城市和鄉鎮地區',
+          },
+        ]"
       />
       <!-- 地區彈出層 -->
       <van-popup v-model="show" round position="bottom">
@@ -40,16 +73,27 @@
         v-model="obj.detail"
         required
         placeholder="詳細地址"
+        :rules="[
+          {
+            required: true,
+            message: '請填寫詳細地址',
+          },
+        ]"
       />
 
       <van-cell center title="設為預設地址">
         <template #right-icon>
-          <van-switch v-model="obj.isDefault" size="24" />
+          <van-switch v-model="is_default_boolean" size="24" />
         </template>
       </van-cell>
 
       <div class="btns">
-        <van-button type="primary" block round color="#18a999" @click="submit"
+        <van-button
+          type="primary"
+          block
+          round
+          color="#18a999"
+          native-type="submit"
           >提交</van-button
         >
         <van-button
@@ -62,23 +106,25 @@
           >刪除</van-button
         >
       </div>
-    </div>
+    </van-form>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { getAddressOneAPI, updateAddressAPI, addAddressAPI } from "@/api/user";
 export default {
   name: "addressEdit",
   data() {
     return {
       obj: {
-        name: "",
-        tel: "",
+        recipient_name: "",
+        phone: "",
         address: "",
-        isDefault: "",
+        is_default: 0,
         city: "",
         detail: "",
+        user_id: "",
+        id: "",
       },
       isAdd: false,
       show: false,
@@ -445,17 +491,25 @@ export default {
     };
   },
   computed: {
-    ...mapState("user", ["addressList"]),
+    // 預設值從 tinyint 轉 boolean
+    is_default_boolean: {
+      get() {
+        return this.obj.is_default === 1;
+      },
+      set(value) {
+        this.obj.is_default = value ? 1 : 0;
+      },
+    },
   },
-  mounted() {
+  async mounted() {
     // 是新增地址
     if (this.$route.path === "/addressAdd") {
       this.isAdd = true;
     } else {
       // 是編輯地址
-      this.obj = this.addressList.find(
-        (item) => +item.id === +this.$route.params.id
-      );
+      const res = await getAddressOneAPI(this.$route.params.id);
+      console.log(res);
+      this.obj = res.data[0];
     }
   },
   methods: {
@@ -463,21 +517,24 @@ export default {
       this.show = false;
       this.obj.city = selectedOptions.map((option) => option.text).join(" ");
     },
-    submit() {
-      console.log(this.obj.isDefault);
-
+    async submit() {
       // 拼接地址
       this.obj.address = [
         this.obj.city.replace(/\s/g, ""),
         this.obj.detail,
       ].join("");
 
-      // 判斷是新增地址
-      if (this.$route.path === "/addressAdd") {
-        this.$store.commit("user/addAddress", this.obj);
+      if (this.isAdd) {
+        // 判斷是新增地址
+        // eslint-disable-next-line no-unused-vars
+        const { id, user_id, ...addObj } = this.obj; // 解构并排除id和user_id
+        console.log(addObj);
+        const res = await addAddressAPI(addObj);
+        console.log(res);
       } else {
         // 是編輯地址
-        this.$store.commit("user/updateAddress", this.obj);
+        const res = await updateAddressAPI(this.obj.id, this.obj);
+        console.log(res);
       }
       this.$router.push("/address");
     },
@@ -509,7 +566,14 @@ export default {
       background-color: #18a999;
     }
     .btns {
-      padding: 150px 5px 0 5px;
+      position: fixed;
+      bottom: 5px; /* 固定在視窗底部 */
+      left: 50%; /* 將按鈕的左邊對齊到視窗中間 */
+      transform: translateX(-50%); /* 將按鈕的中心移到正中間 */
+      width: 95%; /* 使按鈕寬度為整個視窗寬度 */
+      z-index: 1000; /* 確保按鈕不會被其他元素遮蓋 */
+      box-sizing: border-box;
+      /* padding: 150px 5px 0 5px; */
       .delete {
         margin-top: 10px;
         color: #18a999 !important;

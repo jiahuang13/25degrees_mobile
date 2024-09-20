@@ -28,6 +28,46 @@ export const loginAPI = (data) => {
   });
 };
 
+// ---------------- 地址 ---------------------
+//新增地址
+export const addAddressAPI = (data) => {
+  return request({
+    url: "/addAddress",
+    method: "POST",
+    data,
+  });
+};
+
+// 獲取地址list
+export const getAddressListAPI = () => {
+  return request({
+    url: "/addressList",
+  });
+};
+
+// 獲取單一地址
+export const getAddressOneAPI = (id) => {
+  return request({
+    url: `/address/${id}`,
+  });
+};
+
+//獲取預設地址
+export const getDefaultAddressAPI = () => {
+  return request({
+    url: "/addressDefault",
+  });
+};
+
+// 更新地址
+export const updateAddressAPI = (id, data) => {
+  return request({
+    url: `/address/${id}`,
+    method: "PATCH",
+    data,
+  });
+};
+
 // --------- 後台 --------------
 // 獲取所有會員資料
 export const getAllUserAPI = () => {

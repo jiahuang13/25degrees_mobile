@@ -1,6 +1,15 @@
 <template>
   <div class="login">
-    <van-nav-bar title="登入" left-text="返回" left-arrow />
+    <van-nav-bar title="登入">
+      <template #left>
+        <van-icon
+          name="arrow-left"
+          size="18"
+          color="#18a999"
+          @click="$router.push('/home')"
+        />
+      </template>
+    </van-nav-bar>
     <van-form validate-trigger="onBlur" validate-first @submit="submit">
       <van-field
         v-model="form.username"
@@ -48,13 +57,13 @@ export default {
   methods: {
     async submit() {
       const res = await loginAPI(this.form);
-      console.log(res);
-      if (res.data.status === 200) {
-        this.$toast.success("登入成功，正在跳轉...");
+      // console.log(res);
+      if (res.status === 200) {
+        this.$toast.success("登入成功");
         setToken(res.token);
         this.$router.push("/");
       } else {
-        this.$toast.fail(res.data.message);
+        this.$toast.fail(res.message);
       }
     },
     validator(val) {
