@@ -4,17 +4,13 @@ export default {
   state() {
     return {
       list: [],
-      selectedList: [],
+      checkedList: [],
     };
   },
   mutations: {
     updateList(state, newList) {
       state.list = newList;
       // console.log(state.list, newList)
-      localStorage.setItem("25degrees_cart", JSON.stringify(state.list));
-    },
-    updateSelectedList(state, selectedItems) {
-      state.selectedList = [...selectedItems]; // 更新选中的商品列表
     },
     updateCount(state, obj) {
       // obj: { id, newcount}
@@ -28,25 +24,31 @@ export default {
     },
     deleteProduct(state, id) {
       state.list = state.list.filter((item) => item.id !== id);
-      state.selectedList = state.selectedList.filter((item) => item.id !== id);
+      state.checkedList = state.checkedList.filter((item) => item.id !== id);
       localStorage.setItem("25degrees_cart", JSON.stringify(state.list));
     },
-    getList(state) {
-      const res = localStorage.getItem("25degrees_cart");
-      state.list = res ? JSON.parse(res) : [];
+  },
+  // 有異步操作才需要 action
+  actions: {
+    async getListAPI(context) {
+      const res = await JSON.parse(localStorage.getItem("25degrees_cart"));
+      if (res) {
+        context.commit("updateList", res);
+      } else {
+        return;
+      }
     },
   },
-  actions: {},
   getters: {
     // 商品總數量
     total(state) {
-      return state.selectedList.reduce((sum, item) => sum + item.count, 0);
+      return state.checkedList.reduce((sum, item) => sum + item.count, 0);
       // console.log(state)
     },
     // 商品總價
     totalPrice(state) {
       return (
-        state.selectedList.reduce(
+        state.checkedList.reduce(
           (sum, item) =>
             sum + item.count * Math.floor((item.price * item.discount) / 100),
           0

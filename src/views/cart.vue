@@ -13,8 +13,9 @@
           ><CartItem
             :item="item"
             :index="index"
-            :selected="isSelected(item)"
-            @toggle="toggleItem(item)"
+            :selected="selectedItems[index]"
+            @toggle="toggleItem(index)"
+            @watch="onItemChange"
           ></CartItem
           ><template #right>
             <van-button
@@ -53,23 +54,17 @@
 
 <script>
 import CartItem from "@/components/CartItem.vue";
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 export default {
   name: "cartPage",
   components: {
     CartItem,
   },
-  data() {
-    return {
-      checkAll: false,
-    };
-  },
   computed: {
-    ...mapState("cart", ["list", "selectedList"]),
-    isCheckedAll() {
-      return (
-        this.selectedList.length === this.list.length && this.list.length > 0
-      );
+    ...mapState("cart", ["list"]),
+    // 動態計算選中的商品
+    selectedList() {
+      return this.list.filter((item, index) => this.selectedItems[index]);
     },
     // 商品總數量
     total() {
@@ -87,49 +82,41 @@ export default {
       );
     },
   },
-  watch: {
-    isCheckedAll(newVal) {
-      console.log("watch checkall", newVal);
-
-      this.checkAll = newVal;
-    },
+  data() {
+    return {
+      checkAll: false,
+      selectedItems: [],
+    };
   },
-  mounted() {
-    this.$store.commit("cart/getList");
-    this.$nextTick(() => {
-      console.log(this.list, this.selectedList, this.checkAll);
-    });
+  async mounted() {
+    await this.$store.commit("cart/getListAPI");
+    // console.log(this.list);
+    // 根據 items 的長度來初始化 selectedItems，默認為未選中
+    this.selectedItems = this.list.map(() => false);
+    // console.log(this.selectedItems);
   },
   methods: {
-    ...mapMutations("cart", ["updateSelectedList"]),
-    // boolean
-    isSelected(item) {
-      return this.selectedList.includes(item);
-    },
     deleteItem(id) {
       this.$store.commit("cart/deleteProduct", id);
     },
     // 更新單個選中狀態
-    toggleItem(item) {
-      // const isSelected = this.isSelected(item);
-      let updatedList;
-      if (this.isSelected(item)) {
-        updatedList = this.selectedList.filter((i) => i.id !== item.id); // 如果已经选中则取消(filter會留下符合 i.id !== item.id 的商品)
-      } else {
-        updatedList = [...this.selectedList, item]; // 如果没选中则加入列表
-      }
-      this.updateSelectedList(updatedList);
+    toggleItem(index) {
+      this.$set(this.selectedItems, index, !this.selectedItems[index]);
+      // console.log(this.selectedItems, index, !this.selectedItems[index]);
     },
     // 切換全選/取消全選
     toggleAll() {
-      console.log("前：", this.checkAll);
-
-      const updatedList = this.checkAll ? [] : [...this.list];
-      this.updateSelectedList(updatedList);
-
-      this.$nextTick(() => {
-        console.log("後：", this.checkAll);
-      });
+      // 當全選按鈕被點擊時，將所有 checkbox 設為相同的狀態
+      this.selectedItems = this.selectedItems.map(() => this.checkAll);
+      if (this.checkAll) {
+        // this.$store.commit()
+      }
+    },
+    // 當某個 checkbox 被點擊時，檢查是否所有選項都已選中
+    onItemChange() {
+      // 判斷是否所有選項都被選中
+      console.log(this.selectedItems);
+      this.checkAll = this.selectedItems.every((item) => item === true);
     },
   },
 };
