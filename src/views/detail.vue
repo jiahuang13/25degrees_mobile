@@ -115,6 +115,7 @@
 <script>
 import { mapState } from "vuex";
 import { getOneProductAPI } from "@/api/product";
+
 export default {
   name: "detailPage",
   data() {

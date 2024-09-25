@@ -14,6 +14,13 @@ export const getAllProductAPI = () => {
   });
 };
 
+// 獲取所有商品 隨機排序
+export const getAllProductRandAPI = () => {
+  return request({
+    url: "/productRand",
+  });
+};
+
 // 搜索結果
 export const getSearchResultsAPI = (params) => {
   return request({
@@ -21,6 +28,9 @@ export const getSearchResultsAPI = (params) => {
     params,
   });
 };
+
+// 收藏
+export const collectAPI = () => {};
 
 // ----- 後台 ------
 // 新增商品

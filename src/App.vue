@@ -42,23 +42,6 @@ export default {
       }
     },
   },
-  // created() {
-  //   this.$navigation.on("forward", () => {
-  //     this.enterTransition = "animate__animated animate__slideInRight";
-  //     this.leaveTransition = "animate__animated animate__slideOutLeft";
-  //     console.log("forward");
-  //   });
-  //   this.$navigation.on("back", () => {
-  //     this.enterTransition = "animate__animated animate__slideInLeft";
-  //     this.leaveTransition = "animate__animated animate__slideOutRight";
-  //     console.log("back");
-  //   });
-  //   this.$navigation.on("replace", () => {
-  //     this.enterTransition = "animate__animated animate__fadeIn";
-  //     this.leaveTransition = "animate__animated animate__fadeOut";
-  //     console.log("replace");
-  //   });
-  // },
 };
 </script>
 
@@ -70,11 +53,7 @@ export default {
   // text-align: center;
   color: #4d4e4e;
   .router-view {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    min-height: 100vh; // 至少占满一个视口的高度
   }
 }
 </style>

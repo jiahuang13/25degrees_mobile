@@ -54,7 +54,7 @@ instance.interceptors.response.use(
         console.error("伺服器錯誤，請稍後再試");
       } else {
         // 其他錯誤，顯示錯誤消息
-        console.error(`錯誤：${error.response.data.message || "未知錯誤"}`);
+        console.error(`錯誤：${error.response}`);
       }
     } else {
       console.error("網絡錯誤，請檢查你的網絡連接");

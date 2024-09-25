@@ -27,7 +27,11 @@
             </div>
           </template>
           <template #right-icon>
-            <van-icon name="edit" @click.stop="edit(item.id)" />
+            <van-icon
+              v-if="!$route.query.select"
+              name="edit"
+              @click.stop="edit(item.id)"
+            />
           </template>
           <template #label>
             <div>{{ item.address }}</div>
@@ -65,8 +69,7 @@ export default {
     },
     select(item) {
       if (this.checkOutSelect) {
-        console.log(item.id);
-
+        // console.log(item.id);
         this.$router.push({
           name: "checkOut",
           params: { selectedId: item.id },
@@ -75,12 +78,12 @@ export default {
     },
   },
   async mounted() {
-    console.log("Route params:", this.$route.params);
+    // console.log("Route params:", this.$route.params);
     this.checkOutSelect = this.$route.query.select || false;
     // 獲取所有地址
     try {
       const res = await getAddressListAPI();
-      console.log(res);
+      // console.log(res);
       this.addressList = res.data;
     } catch (err) {
       console.log("獲取地址列表錯誤:", err);

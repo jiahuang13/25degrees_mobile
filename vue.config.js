@@ -8,11 +8,7 @@ module.exports = defineConfig({
   css: {
     loaderOptions: {
       less: {
-        lessOptions: {
-          modifyVars: {
-            hack: `true; @import "@/style/index.less";`,
-          },
-        },
+        additionalData: `@import "@/global.less";`,
       },
     },
   },

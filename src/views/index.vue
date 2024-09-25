@@ -92,7 +92,7 @@ export default {
     this.bodyList = data.filter((ele) => ele.category === "2");
     this.faceList = data.filter((ele) => ele.category === "3");
     this.oilList = data.filter((ele) => ele.category === "1");
-    this.$store.dispatch("cart/getListAPI");
+    // this.$store.commit("cart/getList");
   },
 };
 </script>

@@ -2,7 +2,7 @@
   <div class="OrderItem">
     <div class="top">
       <!-- 圖片 -->
-      <van-image width="4rem" height="4rem" fit="cover" :src="item.img" />
+      <van-image width="3rem" height="3rem" fit="cover" :src="item.img" />
       <!-- info -->
       <div class="info">
         <div class="info-top">
@@ -12,7 +12,7 @@
           <!-- <div class="detail">戴紅色帽子的</div> -->
         </div>
         <div class="info-btm">
-          <div class="price">${{ discountPrice }}</div>
+          <div class="price">${{ item.price }}</div>
           <div class="count">x{{ item.count }}</div>
         </div>
       </div>
@@ -23,19 +23,21 @@
 <script>
 export default {
   name: "OrderItem",
+  data() {
+    return {
+      // item: {
+      //   img: "https://i.imgur.com/EptdM3g.jpeg",
+      //   price: 88,
+      //   name: "洛神花",
+      //   count: 3,
+      // },
+    };
+  },
   props: {
     item: {
+      // status
       type: Object,
       required: true,
-    },
-  },
-  computed: {
-    discountPrice() {
-      if (this.item.discount) {
-        return Math.floor((this.item.price * this.item.discount) / 100);
-      } else {
-        return this.item.price;
-      }
     },
   },
 };
@@ -43,7 +45,7 @@ export default {
 
 <style>
 .OrderItem {
-  background-color: #ffffff7f;
+  background-color: #fff;
   margin-top: 1px;
   .van-divider {
     margin: 0;

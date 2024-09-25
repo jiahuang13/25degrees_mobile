@@ -29,14 +29,14 @@
       </div>
       <!-- 底部全選、計算 -->
       <van-submit-bar
-        :price="totalPrice"
+        :price="totalPriceWithoutFee"
         label="總金額："
         currency="$"
         decimal-length=""
         :button-text="`去買單(${total})`"
         button-color="#18a999"
         :disabled="total === 0"
-        @submit="$router.push('/checkOut')"
+        @submit="checkOut"
       >
         <van-checkbox v-model="checkAll" @click="toggleAll">全選</van-checkbox>
       </van-submit-bar>
@@ -60,11 +60,20 @@ export default {
   components: {
     CartItem,
   },
+  data() {
+    return {
+      checkAll: false,
+      selectedItems: [],
+    };
+  },
   computed: {
     ...mapState("cart", ["list"]),
     // 動態計算選中的商品
     selectedList() {
-      return this.list.filter((item, index) => this.selectedItems[index]);
+      const selectedList = this.list.filter(
+        (item, index) => this.selectedItems[index]
+      );
+      return selectedList;
     },
     // 商品總數量
     total() {
@@ -72,7 +81,7 @@ export default {
       // console.log(state)
     },
     // 商品總價
-    totalPrice() {
+    totalPriceWithoutFee() {
       return (
         this.selectedList.reduce(
           (sum, item) =>
@@ -82,14 +91,8 @@ export default {
       );
     },
   },
-  data() {
-    return {
-      checkAll: false,
-      selectedItems: [],
-    };
-  },
-  async mounted() {
-    await this.$store.commit("cart/getListAPI");
+  mounted() {
+    this.$store.dispatch("cart/getList");
     // console.log(this.list);
     // 根據 items 的長度來初始化 selectedItems，默認為未選中
     this.selectedItems = this.list.map(() => false);
@@ -101,22 +104,24 @@ export default {
     },
     // 更新單個選中狀態
     toggleItem(index) {
+      // 將索引為 index 的數組選項取反
       this.$set(this.selectedItems, index, !this.selectedItems[index]);
-      // console.log(this.selectedItems, index, !this.selectedItems[index]);
     },
     // 切換全選/取消全選
     toggleAll() {
       // 當全選按鈕被點擊時，將所有 checkbox 設為相同的狀態
       this.selectedItems = this.selectedItems.map(() => this.checkAll);
-      if (this.checkAll) {
-        // this.$store.commit()
-      }
     },
     // 當某個 checkbox 被點擊時，檢查是否所有選項都已選中
     onItemChange() {
       // 判斷是否所有選項都被選中
-      console.log(this.selectedItems);
+      // console.log(this.selectedItems);
       this.checkAll = this.selectedItems.every((item) => item === true);
+    },
+    checkOut() {
+      // 跳轉結帳頁面前更新checkedList
+      this.$store.commit("cart/updateCheckedList", this.selectedList);
+      this.$router.push("/checkOut");
     },
   },
 };

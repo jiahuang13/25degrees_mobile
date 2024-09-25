@@ -42,12 +42,13 @@
     </div>
     <!-- 底部計算 -->
     <van-submit-bar
-      :price="totalPrice + 10000"
+      :price="totalPrice * 100"
       label="總付款金額："
       currency="$"
       decimal-length=""
       button-text="結帳"
       button-color="#18a999"
+      @submit="submit"
     >
     </van-submit-bar>
   </div>
@@ -56,6 +57,7 @@
 <script>
 import OrderItem from "@/components/OrderItem.vue";
 import { getDefaultAddressAPI, getAddressOneAPI } from "@/api/user";
+import { createOrderAPI } from "@/api/order";
 import { mapState, mapGetters } from "vuex";
 export default {
   name: "checkOut",
@@ -66,18 +68,19 @@ export default {
     return {
       note: "",
       contact: {
+        id: "",
         address: "",
         phone: "",
         recipient_name: "",
       },
+      orderId: "",
     };
   },
   computed: {
-    ...mapState("cart", ["selectedList"]),
-    ...mapGetters("cart", ["total", "totalPrice"]),
+    ...mapState("cart", ["checkedList"]),
+    ...mapGetters("cart", ["total", "totalPrice", "finalList"]),
   },
   async mounted() {
-    // 收貨地址
     // 如果是從選擇頁面過來，調用選擇的收貨地址
     if (this.$route.params.selectedId) {
       try {
@@ -101,7 +104,29 @@ export default {
         console.error("获取地址失败:", err);
       }
     }
-    // 選中商品列表
+  },
+  methods: {
+    async submit() {
+      // items(id, count, price), totalprice
+      // console.log(this.finalList, this.totalPrice, this.contact.id);
+      const data = {
+        finalList: this.finalList,
+        totalPrice: this.totalPrice,
+        address_id: this.contact.id,
+      };
+      try {
+        const res = await createOrderAPI(data);
+        // console.log(res.orderId);
+        if (res.status === 200) {
+          // 訂單建立成功後：移除購物車中 checkedList 品項
+          this.$store.commit("cart/removeCheckedListFromList");
+          this.orderId = res.orderId;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      this.$router.push({ name: "payment", params: { orderId: this.orderId } });
+    },
   },
 };
 </script>
