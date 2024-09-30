@@ -77,9 +77,9 @@ export const getAllUserAPI = () => {
 };
 
 // 獲取單筆會員資料
-export const getUserAPI = () => {
+export const getUserByIdAPI = (id) => {
   return request({
-    url: "/user",
+    url: `/user/${id}`,
   });
 };
 
@@ -92,19 +92,18 @@ export const deleteUserAPI = (id) => {
 };
 
 // 更新會員資料
-export const updateUserAPI = (id, data) => {
+export const updateUserAPI = (data) => {
   return request({
-    url: `/user/${id}`,
+    url: "/user",
     method: "PATCH",
     data,
   });
 };
 
-// 管理員登入
-export const adminUserLoginAPI = (data) => {
+// 會員搜尋
+export const searchUserAPI = (params) => {
   return request({
-    url: "/admin/login",
-    method: "POST",
-    data,
+    url: "/user/search",
+    params,
   });
 };

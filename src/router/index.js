@@ -11,23 +11,32 @@ const routes = [
     component: () => import("@/views/layout.vue"),
     meta: { depth: 1 },
     children: [
-      { path: "", redirect: "/home" },
+      { path: "", redirect: "home" },
       {
-        path: "/home",
+        path: "home",
         component: () => import("@/views/index.vue"),
-        meta: { depth: 1 },
+        meta: { depth: 1, tabbarName: "home" },
       },
       {
-        path: "/cart",
+        path: "cart",
         component: () => import("@/views/cart.vue"),
-        meta: { depth: 2 },
+        meta: { depth: 1, tabbarName: "cart" },
       },
       {
-        path: "/user",
+        path: "user",
         component: () => import("@/views/user.vue"),
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, tabbarName: "user" },
       },
-      { path: "/blog", component: () => import("@/views/blog.vue") },
+      {
+        path: "blog",
+        component: () => import("@/views/blog.vue"),
+        meta: { depth: 1, tabbarName: "blog" },
+      },
+      {
+        path: "blog/:id",
+        component: () => import("@/views/blogDetail.vue"),
+        meta: { depth: 2, tabbarName: "blog" },
+      },
     ],
   },
   {
@@ -81,11 +90,23 @@ const routes = [
   {
     path: "/admin",
     component: () => import("@/views-admin/layout.vue"),
+    meta: { requiresAuth: true },
     children: [
-      { path: "", redirect: "/product" },
+      { path: "", redirect: "product" },
       {
-        path: "/product",
+        path: "product",
         component: () => import("@/views-admin/product.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "user",
+        component: () => import("@/views-admin/user.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "blog",
+        component: () => import("@/views-admin/blog.vue"),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -94,25 +115,29 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
   routes,
+  // 添加 scrollBehavior 配置
+  scrollBehavior(to, from, savedPosition) {
+    // 如果有儲存的滾動位置，則返回儲存的位置（例如按返回鍵時）
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      // 否則返回到頂部
+      return { x: 0, y: 0 };
+    }
+  },
 });
 
 // 路由守衛
 router.beforeEach((to, from, next) => {
   const token = getToken(); // 檢查本地是否有token
   if (to.meta.requiresAuth && !token) {
-    // console.log("1");
-
     Toast("請先登入");
     return next("/login"); // 若未認證，跳轉至登入頁面
   } else if (to.path === "/login" && token) {
     // 若用戶已經登入，防止再訪問 login 頁面
-    // console.log("2");
-
     return next("/home");
   } else if (from.path === to.path) {
     // 避免重複導航
-    // console.log("3");
-
     return next(false); // 阻止重複導航
   } else {
     next(); // 允許導航

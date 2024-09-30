@@ -1,7 +1,7 @@
 <template>
   <div class="app-wrapper">
     <Sidebar class="sidebar-container" />
-    <router-view></router-view>
+    <router-view class="router-view"></router-view>
   </div>
 </template>
 
@@ -24,6 +24,7 @@ body {
   padding: 0;
 }
 .app-wrapper {
+  background-color: #eaeaea48;
   position: relative;
   height: 100%;
   width: 100%;
@@ -35,10 +36,18 @@ body {
     min-width: 820px;
   }
   .sidebar-container {
-    width: 15vw;
-    max-width: 260px;
+    width: 20vw;
+    // max-width: 260px;
     background-color: #fff;
     height: 100vh;
+  }
+  .router-view {
+    margin: 20px;
+    background-color: #fff;
+    max-height: 60%;
+    width: 100%;
+    max-width: 80vw;
+    max-height: 100vh;
   }
 }
 </style>

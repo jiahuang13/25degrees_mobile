@@ -51,11 +51,19 @@ export const deleteProductAPI = (id) => {
 };
 
 // 更新商品
-export const updateProductAPI = (id, data) => {
+export const updateProductAPI = (data) => {
   return request({
-    url: `/product/${id}`,
+    url: "/product",
     method: "PATCH",
     data,
+  });
+};
+
+// 後台搜尋商品
+export const searchProductAPI = (params) => {
+  return request({
+    url: "/product/search",
+    params,
   });
 };
 

@@ -85,13 +85,13 @@ export default {
   },
   async mounted() {
     const res = await getAllProductAPI();
+    console.log(res);
     const data = res.data;
-    // console.log(res);
 
-    this.incenseList = data.filter((ele) => ele.category === "4");
-    this.bodyList = data.filter((ele) => ele.category === "2");
-    this.faceList = data.filter((ele) => ele.category === "3");
-    this.oilList = data.filter((ele) => ele.category === "1");
+    this.incenseList = data.filter((ele) => ele.category === 4);
+    this.bodyList = data.filter((ele) => ele.category === 2);
+    this.faceList = data.filter((ele) => ele.category === 3);
+    this.oilList = data.filter((ele) => ele.category === 1);
     // this.$store.commit("cart/getList");
   },
 };

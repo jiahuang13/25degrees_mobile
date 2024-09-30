@@ -28,42 +28,55 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-// 響應攔截器
+// 攔截器 - 全局錯誤處理
 instance.interceptors.response.use(
   (response) => {
-    // 對響應數據進行處理
-    return response.data; // 可以直接返回數據，這樣在請求成功時可以更簡單地處理
+    // 成功響應，直接返回數據
+    return response.data;
   },
   (error) => {
-    // 對響應錯誤做點什麼
+    // 錯誤響應
     if (error.response) {
       const { status } = error.response;
-
-      if (status === 401) {
-        // 401 未授權，可能是 token 過期或無效
-        // console.warn("未授權或 token 過期，請重新登錄");
-        Toast.fail("身份認證失敗，請重新登入");
-        removeToken(); // 清除本地 token
-        router.push("/login"); // 重定向到登入頁面
-      } else if (status === 403) {
-        // 403 禁止訪問，權限問題
-        console.error("禁止訪問，權限不足");
-      } else if (status >= 500) {
-        // 500 伺服器錯誤
-        console.error("伺服器錯誤，請稍後再試");
-      } else {
-        // 其他錯誤，顯示錯誤消息
-        console.error(`錯誤：${error.response}`);
+      switch (status) {
+        case 401:
+          Toast.fail("身份認證失敗，請重新登入");
+          // 移除本地 token
+          removeToken();
+          // 跳轉到登入頁面
+          router.push("/login");
+          break;
+        case 403:
+          Toast.fail("權限不足，禁止訪問");
+          break;
+        case 404:
+          Toast.fail("請求資源不存在");
+          break;
+        case 500:
+          Toast.fail("伺服器錯誤，請稍後再試");
+          break;
+        default:
+          Toast.fail(`未知錯誤：${error.response.data.message || "未知錯誤"}`);
       }
     } else {
-      console.error("網絡錯誤，請檢查你的網絡連接");
+      Toast.fail("網絡錯誤，請檢查你的網絡連接");
     }
-
-    // 返回一個失敗的 Promise，這樣可以在請求處理中捕捉到錯誤
+    // 返回一個被拒絕的 Promise，讓上層函數能捕捉到錯誤
     return Promise.reject(error);
   }
 );
 
-// 導出實例
-export default instance;
+// 統一封裝 request 函數
+const request = async (options) => {
+  try {
+    // 使用 await 獲取 axios 返回結果
+    const response = await instance(options);
+    return response;
+  } catch (error) {
+    // 可以在這裡進一步自定義錯誤處理
+    console.error("API 調用失敗：", error);
+    return null; // 返回 `null` 來標識失敗
+  }
+};
+
+export default request;

@@ -7,7 +7,9 @@
       </template>
     </van-nav-bar>
 
-    <div id="paypal-button-container" class="paypal"></div>
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
+    <div v-else id="paypal-button-container" class="paypal"></div>
   </div>
 </template>
 
@@ -18,6 +20,7 @@ export default {
   name: "paymentPage",
   data() {
     return {
+      loading: true,
       amount: "",
       orderId: "",
       paypalId: "",
@@ -28,7 +31,7 @@ export default {
     this.orderId = this.$route.params.orderId;
     try {
       const res = await getOneOrderById(this.orderId);
-      // console.log(res.data.total);
+      console.log(res.data);
       this.amount = res.data.total;
     } catch (err) {
       console.log(err);
@@ -45,6 +48,8 @@ export default {
     };
 
     document.body.appendChild(script);
+
+    this.loading = false;
   },
   methods: {
     async createOrder() {
@@ -111,6 +116,13 @@ export default {
 <style>
 .payment {
   background-color: #eaeaea48;
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
   .van-nav-bar .van-icon,
   .van-submit-bar__price {
     color: #18a999;

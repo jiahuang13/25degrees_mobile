@@ -32,10 +32,26 @@ export const deleteBlogAPI = (id) => {
 };
 
 // 更新文章
-export const updateBlogAPI = (id, data) => {
+export const updateBlogAPI = (data) => {
   return request({
-    url: `/blog/${id}`,
+    url: "/blog/search",
     method: "PATCH",
     data,
+  });
+};
+
+// 搜尋文章
+export const searchBlogAPI = (params) => {
+  return request({
+    url: "/blog/search",
+    params,
+  });
+};
+
+// 取得 3 條推薦文章（隨機）
+export const getThreeRandBlogAPI = (id) => {
+  return request({
+    url: "/blog/threeRand",
+    params: { id },
   });
 };

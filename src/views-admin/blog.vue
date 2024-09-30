@@ -1,37 +1,28 @@
 <template>
-  <div class="adminProduct">
+  <div class="adminBlog">
     <!-- 搜尋 -->
     <div class="search-container">
-      <span class="search-label">商品名稱：</span>
+      <span class="search-label">標題：</span>
       <el-input
-        v-model="search.name"
+        v-model="search.title"
         clearable
         placeholder="請輸入內容"
         class="search-main"
       />
-      <span class="search-label">商品敘述：</span>
+      <span class="search-label">內文：</span>
       <el-input
         v-model="search.content"
         clearable
         placeholder="請輸入內容"
         class="search-main"
       />
-      <span class="search-label">類別：</span>
-      <el-select v-model="search.category">
-        <el-option
-          v-for="item in categoryList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        />
-      </el-select>
       <el-button type="primary" class="search-btn" @click="doSearch"
         >查詢</el-button
       >
     </div>
     <div class="create-container">
-      <el-button type="primary" @click="addNewProduct">新增商品</el-button>
-      <!-- <el-button @click="delAllCard">批量删除</el-button> -->
+      <el-button type="primary" @click="addNewBlog">新增文章</el-button>
+      <div class="total">共 {{ total }} 篇</div>
     </div>
     <el-scrollbar always>
       <!-- 表格 -->
@@ -42,16 +33,17 @@
           empty-text="沒有符合資料"
           border
         >
-          <el-table-column prop="id" label="ID" align="center">
+          <el-table-column prop="id" label="ID" align="center" width="80">
           </el-table-column>
           <el-table-column
             prop="visible"
             label="前台顯示"
             align="center"
             :formatter="formatVisible"
+            width="50"
           >
           </el-table-column>
-          <el-table-column prop="thumb" label="縮圖" width="110" align="center">
+          <el-table-column prop="img" label="縮圖" width="110" align="center">
             <template slot-scope="scope">
               <el-image
                 style="width: 80px; height: 80px"
@@ -60,23 +52,12 @@
               ></el-image>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="category"
-            label="類別"
-            :formatter="formatCategory"
-            align="center"
-          >
+          <el-table-column prop="title" label="標題" width="150" align="center">
           </el-table-column>
-          <el-table-column prop="name" label="商品名" align="center">
-          </el-table-column>
-          <el-table-column prop="price" label="價格" align="center">
-          </el-table-column>
-          <el-table-column label="商品介紹" width="300">
+          <el-table-column label="文章介紹">
             <template slot-scope="scope">
               <div class="overflow-hidden" v-html="scope.row.content"></div>
             </template>
-          </el-table-column>
-          <el-table-column prop="count" label="庫存" align="center">
           </el-table-column>
           <el-table-column label="操作" fixed="right" width="80" align="center">
             <template #default="scope">
@@ -84,13 +65,10 @@
                 <el-button
                   size="mini"
                   type="text"
-                  @click="editProduct(scope.row.id)"
+                  @click="editBlog(scope.row.id)"
                   >編輯</el-button
                 >
-                <el-button
-                  size="mini"
-                  type="text"
-                  @click="delProduct(scope.row)"
+                <el-button size="mini" type="text" @click="delBlog(scope.row)"
                   >刪除</el-button
                 >
               </div>
@@ -102,7 +80,7 @@
 
     <!-- 編輯對話框 -->
     <el-dialog
-      :title="isEdit ? '編輯商品' : '新增商品'"
+      :title="isEdit ? '編輯文章' : '新增文章'"
       :visible.sync="dialog"
       width="70%"
       :before-close="confirmClose"
@@ -116,13 +94,10 @@
         :model="form"
         :rules="rules"
       >
-        <el-form-item label="商品名稱" prop="name">
-          <el-input v-model="form.name"></el-input>
+        <el-form-item label="標題" prop="title">
+          <el-input v-model="form.title"></el-input>
         </el-form-item>
-        <el-form-item label="商品價格" prop="price">
-          <el-input v-model="form.price"></el-input>
-        </el-form-item>
-        <el-form-item label="商品介紹" prop="content">
+        <el-form-item label="文章內文" prop="content">
           <quill-editor v-model="form.content"></quill-editor>
         </el-form-item>
         <el-form-item label="圖片連結" prop="img">
@@ -133,26 +108,18 @@
             <img :src="form.img" alt="" width="300px" height="auto" />
           </div>
         </el-form-item>
-        <el-form-item label="庫存量" prop="count">
-          <el-input v-model="form.count"></el-input>
-        </el-form-item>
         <el-form-item label="前台顯示" prop="visible">
-          <el-switch v-model="form.visible"> </el-switch>
-        </el-form-item>
-        <el-form-item label="商品類別" prop="category">
-          <el-radio-group v-model="form.category">
-            <el-radio :label="1">精油</el-radio>
-            <el-radio :label="2">身體保養</el-radio>
-            <el-radio :label="3">臉部保養</el-radio>
-            <el-radio :label="4">香氛</el-radio>
-          </el-radio-group>
+          <el-switch
+            v-model="form.visible"
+            :active-value="1"
+            :inactive-value="0"
+          >
+          </el-switch>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="isEdit ? updateProduct() : saveNewProduct()"
+        <el-button type="primary" @click="isEdit ? updateBlog() : saveNewBlog()"
           >儲 存</el-button
         >
       </span>
@@ -162,13 +129,13 @@
 
 <script>
 import {
-  getAllProductAPI,
-  getOneProductAPI,
-  addNewProductAPI,
-  deleteProductAPI,
-  updateProductAPI,
-  searchProductAPI,
-} from "@/api/product";
+  getAllBlogAPI,
+  deleteBlogAPI,
+  getOneBlogAPI,
+  updateBlogAPI,
+  addNewBlogAPI,
+  searchBlogAPI,
+} from "@/api/blog";
 // 富文本編輯器
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
@@ -176,95 +143,43 @@ import "quill/dist/quill.bubble.css";
 import { quillEditor } from "vue-quill-editor";
 
 export default {
-  name: "adminProduct",
+  name: "adminBlog",
   components: {
     quillEditor,
   },
   data() {
     return {
-      list: [], // 商品列表
+      list: [], // 文章列表
+      total: 0,
       // 请求参数
       search: {
-        name: "",
+        title: "",
         content: "",
-        category: null,
       },
-      categoryList: [
-        {
-          id: null,
-          name: "全部",
-        },
-        {
-          id: 1,
-          name: "精油",
-        },
-        {
-          id: 2,
-          name: "身體保養",
-        },
-        {
-          id: 3,
-          name: "臉部保養",
-        },
-        {
-          id: 4,
-          name: "香氛",
-        },
-      ],
       isEdit: true,
       dialog: false,
       form: {
         id: null,
-        name: "",
-        price: "",
+        title: "",
         content: "",
         img: "",
-        category: 0,
-        count: "",
         visible: 1,
       },
       emptyForm: {
         id: null,
-        name: "",
-        price: "",
+        title: "",
         content: "",
         img: "",
-        category: 0,
-        count: "",
         visible: 1,
       },
       rules: {
-        name: [{ required: true, message: "必填", trigger: "blur" }],
+        title: [{ required: true, message: "必填", trigger: "blur" }],
         content: [{ required: true, message: "必填", trigger: "blur" }],
-        price: [
-          {
-            required: true,
-            pattern: /^[1-9]\d*$/,
-            message: "請輸入正整數",
-            trigger: "blur",
-          },
-        ],
         img: [
           {
             required: true,
             pattern: /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/,
             message: "請輸入正確URL格式",
-            trigger: "blur",
-          },
-        ],
-        count: [
-          {
-            required: true,
-            pattern: /^[1-9]\d*$/,
-            message: "請輸入正整數",
-            trigger: "blur",
-          },
-        ],
-        category: [
-          {
-            required: true,
-            pattern: /^[1-4]$/,
-            message: "請輸入正整數",
             trigger: "blur",
           },
         ],
@@ -276,31 +191,26 @@ export default {
   },
   methods: {
     async getList() {
-      const res = await getAllProductAPI();
+      const res = await getAllBlogAPI();
       console.log(res);
       if (res && !res.error) {
         this.list = res.data;
+        this.total = res.data.length;
       }
       // this.total = res.data.length;
-    },
-    formatCategory(row) {
-      const category = this.categoryList.find(
-        (item) => item.id === row.category
-      );
-      return category.name;
     },
     formatVisible(row) {
       return row.visible === 1 ? "是" : "否";
     },
-    delProduct(row) {
-      this.$confirm(`確定刪除商品 ${row.name} 嗎？`, {
+    delBlog(row) {
+      this.$confirm(`確定刪除文章 ${row.title} 嗎？`, {
         confirmButtonText: "確定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(async () => {
           try {
-            const res = await deleteProductAPI(row.id);
+            const res = await deleteBlogAPI(row.id);
             if (res.status === 200) {
               this.getList();
               this.$message({
@@ -319,28 +229,32 @@ export default {
           });
         });
     },
-    async editProduct(id) {
+    async editBlog(ID) {
       // console.log(id);
-      const res = await getOneProductAPI(id);
+      const res = await getOneBlogAPI(ID);
       console.log(res);
 
-      this.form = res.data;
+      const { id, title, content, img, visible } = res.data;
+      this.form = { ...this.form, id, title, content, img, visible };
+
       this.isEdit = true;
       this.dialog = true;
     },
-    updateProduct() {
+    updateBlog() {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           console.log(this.form);
 
-          const result = await updateProductAPI(this.form);
+          const result = await updateBlogAPI(this.form);
           console.log(result);
 
           if (result.status === 200) {
             this.dialog = false;
-            const res = await getAllProductAPI();
+            const res = await getAllBlogAPI();
             console.log(res);
             this.list = res.data;
+            this.total = res.data.length;
+
             // 顯示成功提示
             this.$message.success("編輯成功");
           } else {
@@ -351,24 +265,25 @@ export default {
         }
       });
     },
-    addNewProduct() {
+    addNewBlog() {
       this.isEdit = false;
       this.resetForm();
       this.dialog = true;
     },
-    async saveNewProduct() {
+    async saveNewBlog() {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           console.log(this.form);
 
-          const res = await addNewProductAPI(this.form);
+          const res = await addNewBlogAPI(this.form);
           console.log(res);
 
           if (res.status === 200) {
             this.resetForm();
             this.dialog = false;
-            const res = await getAllProductAPI();
+            const res = await getAllBlogAPI();
             this.list = res.data;
+            this.total = res.data.length;
             // 顯示成功提示
             this.$message.success("新增成功");
           } else {
@@ -380,15 +295,12 @@ export default {
       });
     },
     async doSearch() {
-      if (
-        this.search.name ||
-        this.search.content ||
-        this.search.category !== null
-      ) {
-        const res = await searchProductAPI(this.search);
+      if (this.search.title || this.search.content) {
+        const res = await searchBlogAPI(this.search);
         // console.log(res);
         if (res.data) {
           this.list = res.data;
+          this.total = res.data.length;
         }
       } else {
         return false;
@@ -417,7 +329,7 @@ export default {
 </script>
 
 <style lang="scss">
-.adminProduct {
+.adminBlog {
   padding: 20px;
   background-color: #fff;
   width: 100%;
@@ -453,6 +365,12 @@ export default {
   }
   .create-container {
     padding: 10px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .total {
+      padding-right: 10px;
+    }
   }
   .overflow-hidden {
     overflow: hidden;

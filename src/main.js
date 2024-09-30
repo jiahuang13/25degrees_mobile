@@ -2,13 +2,16 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import animate from "animate.css";
+import navigation from "vue-navigation";
+import VueRouter from "vue-router";
+
 import Vant from "vant";
 import "vant/lib/index.css";
-import animated from "animate.css";
-import navigation from "vue-navigation";
+
 import ElementUI from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
-import VueRouter from "vue-router";
+import "./style/element-variables.scss";
+import locale from "element-ui/lib/locale/lang/zh-TW";
 
 // 覆蓋 VueRouter 的 push,replace 方法來全局處理導航錯誤
 const originalPush = VueRouter.prototype.push;
@@ -21,9 +24,9 @@ VueRouter.prototype.replace = function replace(location) {
 };
 
 Vue.use(Vant);
-Vue.use(animated);
+Vue.use(animate);
 Vue.use(navigation, { router });
-Vue.use(ElementUI);
+Vue.use(ElementUI, { locale });
 
 Vue.config.productionTip = false;
 

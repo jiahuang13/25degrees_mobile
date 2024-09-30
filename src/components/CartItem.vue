@@ -1,5 +1,5 @@
 <template>
-  <div class="CartItem">
+  <div class="CartItem" @click="$router.push(`/detail/${item.id}`)">
     <!-- 勾選框 -->
     <div class="checkbox-wrapper">
       <div class="round">
@@ -26,7 +26,6 @@
       fit="cover"
       radius="5px"
       :src="item.img"
-      @click="$router.push(`/detail/${item.id}`)"
     />
     <!-- info -->
     <div class="info">
