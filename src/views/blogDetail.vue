@@ -139,7 +139,7 @@ export default {
     async copyLink(text) {
       try {
         await navigator.clipboard.writeText(text);
-        this.$toast.success("網址已成功複製到剪貼板！"); // 成功提示
+        this.$toast.success("已複製到剪貼板"); // 成功提示
       } catch (err) {
         console.error("複製失敗：", err);
         this.$toast.fail("複製失敗，請手動選取文字複製！");

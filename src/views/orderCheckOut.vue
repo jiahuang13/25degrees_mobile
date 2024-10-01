@@ -48,6 +48,7 @@
       decimal-length=""
       button-text="結帳"
       button-color="#18a999"
+      :loading="loading"
       @submit="submit"
     >
     </van-submit-bar>
@@ -74,6 +75,7 @@ export default {
         recipient_name: "",
       },
       orderId: "",
+      loading: true,
     };
   },
   computed: {
@@ -104,11 +106,11 @@ export default {
         console.error("获取地址失败:", err);
       }
     }
+    this.loading = false;
   },
   methods: {
     async submit() {
       // items(id, count, price), totalprice
-      // console.log(this.finalList, this.totalPrice, this.contact.id);
       const data = {
         finalList: this.finalList,
         totalPrice: this.totalPrice,
@@ -116,7 +118,7 @@ export default {
       };
       try {
         const res = await createOrderAPI(data);
-        // console.log(res.orderId);
+        console.log(res);
         if (res.status === 200) {
           // 訂單建立成功後：移除購物車中 checkedList 品項
           this.$store.commit("cart/removeCheckedListFromList");

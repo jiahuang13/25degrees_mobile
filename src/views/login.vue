@@ -61,7 +61,9 @@ export default {
       if (res.status === 200) {
         this.$toast.success("登入成功");
         setToken(res.token);
-        this.$router.push("/");
+        // 獲取 URL 中的 `redirect` 參數，如果沒有則跳轉到首頁
+        const redirect = this.$route.query.redirect || "/home";
+        this.$router.push(redirect);
       } else {
         this.$toast.fail(res.message);
       }

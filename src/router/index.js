@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import { getToken } from "@/utils/auth";
 import { Toast } from "vant";
+import store from "@/store"; // Vuex 存取
 
 Vue.use(VueRouter);
 
@@ -60,23 +61,29 @@ const routes = [
     component: () => import("@/views/addressEdit.vue"),
   },
   { path: "/addressAdd", component: () => import("@/views/addressEdit.vue") },
-  { path: "/order", component: () => import("@/views/order.vue") },
+  {
+    path: "/order",
+    name: "order",
+    component: () => import("@/views/order.vue"),
+  },
   {
     path: "/checkOut",
     name: "checkOut",
     component: () => import("@/views/orderCheckOut.vue"),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, requiresOrder: true },
     props: true,
   },
   {
     path: "/payment",
     name: "payment",
     props: true,
+    meta: { requiresPayment: true },
     component: () => import("@/views/payment.vue"),
   },
   {
     path: "/paymentAfter",
     name: "/paymentAfter",
+    meta: { requireOrderStatus: true },
     component: () => import("@/views/paymentAfter.vue"),
   },
   { path: "/login", component: () => import("@/views/login.vue") },
@@ -130,17 +137,42 @@ const router = new VueRouter({
 // 路由守衛
 router.beforeEach((to, from, next) => {
   const token = getToken(); // 檢查本地是否有token
-  if (to.meta.requiresAuth && !token) {
-    Toast("請先登入");
-    return next("/login"); // 若未認證，跳轉至登入頁面
-  } else if (to.path === "/login" && token) {
-    // 若用戶已經登入，防止再訪問 login 頁面
+  const hasAuth = Boolean(token); // 判斷用戶是否已經登入
+  const requiresAuth = to.meta.requiresAuth || false; // 獲取是否需要授權
+  const requiresOrder = to.meta.requiresOrder || false; // 判斷是否需要結帳驗證
+  const requiresPayment = to.meta.requiresPayment || false; // 判斷是否需要付款驗證
+  const requireOrderStatus = to.meta.requireOrderStatus || false;
+
+  // 未授權情況且目標路由需要授權，跳轉至登入頁面
+  if (requiresAuth && !hasAuth) {
+    Toast.fail("請先登入");
+    return next({
+      path: "/login",
+      query: { redirect: to.fullPath }, // 保存當前頁面的完整路徑
+    });
+  }
+
+  // 若已經登入但試圖訪問 login 頁面，重定向至首頁
+  if (to.path === "/login" && hasAuth) {
     return next("/home");
-  } else if (from.path === to.path) {
-    // 避免重複導航
-    return next(false); // 阻止重複導航
+  }
+
+  // 檢查結帳和付款頁面的額外驗證條件
+  if (requiresOrder && !store.state.cart.checkedList.length) {
+    // Toast.fail("購物車為空，無法訪問結帳頁面");
+    return next("/cart");
+  }
+
+  if (requiresPayment && !to.params.orderId) {
+    // Toast.fail("沒有訂單編號，無法訪問付款頁面");
+    return next("/order");
+  }
+
+  if (requireOrderStatus && !to.params.status) {
+    // Toast.fail("無法訪問付款結果頁面");
+    return next("/order");
   } else {
-    next(); // 允許導航
+    next();
   }
 });
 

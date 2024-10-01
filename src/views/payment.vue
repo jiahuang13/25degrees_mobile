@@ -29,12 +29,19 @@ export default {
   async mounted() {
     // 獲取此訂單 id 調用 api 獲得總金額
     this.orderId = this.$route.params.orderId;
-    try {
-      const res = await getOneOrderById(this.orderId);
-      console.log(res.data);
-      this.amount = res.data.total;
-    } catch (err) {
-      console.log(err);
+    console.log(this.orderId);
+
+    if (this.orderId) {
+      try {
+        const res = await getOneOrderById(this.orderId);
+        console.log(res.data);
+        this.amount = res.data.total;
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      console.log("沒有orderId");
+      return;
     }
 
     // 动态加载 PayPal SDK 并在加载完成后初始化 PayPal 按钮
@@ -76,7 +83,7 @@ export default {
             return actions.order.get().then(async function (orderDetails) {
               vm.paypalId = orderDetails.id;
 
-              // 在这里处理支付完成后的逻辑: 將id回傳後端、訂單狀態頁面移動、重定向
+              // 在这里处理支付完成后的逻辑: 將id回傳後端、更新庫存
               const res = await paypalVerifyAPI(vm.orderId, vm.paypalId);
               console.log(res);
 

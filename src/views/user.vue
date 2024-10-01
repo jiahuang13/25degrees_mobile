@@ -24,10 +24,30 @@
 
       <!-- 宮格 -->
       <van-grid icon-size="20">
-        <van-grid-item icon="pending-payment" text="待付款" badge="3" />
-        <van-grid-item icon="send-gift-o" text="待出貨" />
-        <van-grid-item icon="logistics" text="待收貨" />
-        <van-grid-item icon="comment-circle-o" text="評價" />
+        <van-grid-item
+          icon="pending-payment"
+          text="待付款"
+          :badge="status.pending"
+          @click="toOrderStatus('pending')"
+        />
+        <van-grid-item
+          icon="send-gift-o"
+          text="待出貨"
+          :badge="status.paid"
+          @click="toOrderStatus('paid')"
+        />
+        <van-grid-item
+          icon="logistics"
+          text="待收貨"
+          :badge="status.shipped"
+          @click="toOrderStatus('shipped')"
+        />
+        <van-grid-item
+          icon="refund-o"
+          text="退貨/退款"
+          :badge="status.canceled"
+          @click="toOrderStatus('refunded')"
+        />
       </van-grid>
 
       <van-cell-group>
@@ -45,19 +65,43 @@
 </template>
 
 <script>
-import { getUserAPI } from "@/api/user";
+import { getUserByAuthAPI } from "@/api/user";
+import { getOrderStatusCountAPI } from "@/api/order";
 export default {
   name: "userPage",
   data() {
     return {
       username: "",
+      status: {
+        pending: null,
+        paid: null,
+        shipped: null,
+        canceled: null,
+      },
     };
   },
   async mounted() {
     //調用user資料
-    const res = await getUserAPI();
-    // console.log(res.data.username);
-    this.username = res.data.username;
+    const resUser = await getUserByAuthAPI();
+    if (resUser && !resUser.error) {
+      this.username = resUser.data.username;
+    }
+    //調用 order status
+    const resOrder = await getOrderStatusCountAPI();
+    if (resOrder && !resOrder.error) {
+      // console.log(resOrder);
+      this.status = resOrder.data;
+      Object.keys(this.status).forEach((key) => {
+        if (this.status[key] === 0) {
+          this.status[key] = null;
+        }
+      });
+    }
+  },
+  methods: {
+    toOrderStatus(status) {
+      this.$router.push({ name: "order", params: { status } });
+    },
   },
 };
 </script>

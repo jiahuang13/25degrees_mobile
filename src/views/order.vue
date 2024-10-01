@@ -1,12 +1,11 @@
 <template>
-  <div class="order">
-    <div class="loading" v-if="loading">
-      <van-loading></van-loading>
-    </div>
+  <div class="orderPage">
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
     <!-- 頂部 nav -->
     <van-nav-bar title="我的訂單" fixed>
       <template #left>
-        <van-icon name="arrow-left" size="18" @click="$router.go(-1)" />
+        <van-icon name="arrow-left" size="18" @click="$router.push('/user')" />
       </template>
       <template #right>
         <van-icon name="ellipsis" size="18" />
@@ -78,12 +77,15 @@ export default {
   },
   async mounted() {
     this.loading = true;
+    if (this.$route.params.status) {
+      this.activeTab = this.$route.params.status;
+    }
     try {
       const res = await getAllOrdersAPI();
-      console.log(res);
+      // console.log(res);
       const ordersObject = res.data;
       this.orders = Object.values(ordersObject); // 將收到的 orders 對象轉數組
-      console.log(this.orders);
+      // console.log(this.orders);
     } catch (err) {
       console.log(err);
     } finally {
@@ -99,18 +101,15 @@ export default {
 </script>
 
 <style>
-.order {
+.orderPage {
   background-color: #eaeaea48;
-  .loading {
+  min-height: 100vh;
+  .van-loading {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.8); /* 轻微透明的白色背景 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
   }
   .van-nav-bar .van-icon {
     color: #18a999;

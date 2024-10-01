@@ -12,52 +12,57 @@
         <van-image width="60" :src="logoSrc" />
       </template>
     </van-nav-bar>
+
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
     <!-- tab欄 -->
-    <van-tabs v-model="activeTab" color="#18A999" animated swipeable sticky>
-      <van-tab title="香氛蠟燭" name="a">
-        <!-- 輪播圖 -->
-        <van-swipe :autoplay="3000" class="carousell">
-          <van-swipe-item v-for="(image, index) in images" :key="index">
-            <img :src="image" />
-          </van-swipe-item>
-        </van-swipe>
-        <!-- 文字介紹 -->
-        <p class="title">嶄新聞香體驗</p>
-        <p class="content">
-          在放鬆身心的同時，營造出獨特的氛圍，<br />讓家變成一個充滿溫馨和舒適感的地方。
-        </p>
-        <!-- 商品列表 -->
-        <van-row>
-          <van-col span="12" v-for="item in incenseList" :key="item.id"
-            ><ProductCard :item="item"></ProductCard
-          ></van-col>
-        </van-row>
-      </van-tab>
-      <van-tab title="身體保養" name="b">
-        <!-- 商品列表 -->
-        <van-row>
-          <van-col span="12" v-for="item in bodyList" :key="item.id"
-            ><ProductCard :item="item"></ProductCard
-          ></van-col>
-        </van-row>
-      </van-tab>
-      <van-tab title="臉部保養" name="c">
-        <!-- 商品列表 -->
-        <van-row>
-          <van-col span="12" v-for="item in faceList" :key="item.id"
-            ><ProductCard :item="item"></ProductCard
-          ></van-col>
-        </van-row>
-      </van-tab>
-      <van-tab title="天然精油" name="d">
-        <!-- 商品列表 -->
-        <van-row>
-          <van-col span="12" v-for="item in oilList" :key="item.id"
-            ><ProductCard :item="item"></ProductCard
-          ></van-col>
-        </van-row>
-      </van-tab>
-    </van-tabs>
+    <div v-else>
+      <van-tabs v-model="activeTab" color="#18A999" animated swipeable sticky>
+        <van-tab title="香氛蠟燭" name="a">
+          <!-- 輪播圖 -->
+          <van-swipe :autoplay="3000" class="carousell">
+            <van-swipe-item v-for="(image, index) in images" :key="index">
+              <img :src="image" />
+            </van-swipe-item>
+          </van-swipe>
+          <!-- 文字介紹 -->
+          <p class="title">嶄新聞香體驗</p>
+          <p class="content">
+            在放鬆身心的同時，營造出獨特的氛圍，<br />讓家變成一個充滿溫馨和舒適感的地方。
+          </p>
+          <!-- 商品列表 -->
+          <van-row>
+            <van-col span="12" v-for="item in incenseList" :key="item.id"
+              ><ProductCard :item="item"></ProductCard
+            ></van-col>
+          </van-row>
+        </van-tab>
+        <van-tab title="身體保養" name="b">
+          <!-- 商品列表 -->
+          <van-row>
+            <van-col span="12" v-for="item in bodyList" :key="item.id"
+              ><ProductCard :item="item"></ProductCard
+            ></van-col>
+          </van-row>
+        </van-tab>
+        <van-tab title="臉部保養" name="c">
+          <!-- 商品列表 -->
+          <van-row>
+            <van-col span="12" v-for="item in faceList" :key="item.id"
+              ><ProductCard :item="item"></ProductCard
+            ></van-col>
+          </van-row>
+        </van-tab>
+        <van-tab title="天然精油" name="d">
+          <!-- 商品列表 -->
+          <van-row>
+            <van-col span="12" v-for="item in oilList" :key="item.id"
+              ><ProductCard :item="item"></ProductCard
+            ></van-col>
+          </van-row>
+        </van-tab>
+      </van-tabs>
+    </div>
   </div>
 </template>
 
@@ -81,6 +86,7 @@ export default {
       faceList: [],
       oilList: [],
       logoSrc: require("@/assets/image/25°C-logo-textonly.png"),
+      loading: true,
     };
   },
   async mounted() {
@@ -93,6 +99,8 @@ export default {
     this.faceList = data.filter((ele) => ele.category === 3);
     this.oilList = data.filter((ele) => ele.category === 1);
     // this.$store.commit("cart/getList");
+
+    this.loading = false;
   },
 };
 </script>
@@ -100,6 +108,13 @@ export default {
 <style lang="less">
 .home {
   padding: 0 0 50px 0;
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
   .van-nav-bar .van-icon {
     color: #18a999;
   }
@@ -108,6 +123,7 @@ export default {
   }
   .van-tabs {
     padding-top: 50px;
+    padding-bottom: 50px;
     .van-tabs__line {
       width: 25%;
     }

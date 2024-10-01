@@ -25,8 +25,9 @@
       <div class="total">共 {{ total }} 篇</div>
     </div>
     <el-scrollbar always>
+      <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
       <!-- 表格 -->
-      <div class="table">
+      <div class="table" v-else>
         <el-table
           style="width: 100%"
           :data="list"
@@ -149,6 +150,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       list: [], // 文章列表
       total: 0,
       // 请求参数
@@ -186,8 +188,9 @@ export default {
       },
     };
   },
-  mounted() {
-    this.getList();
+  async mounted() {
+    await this.getList();
+    this.loading = false;
   },
   methods: {
     async getList() {
@@ -241,6 +244,7 @@ export default {
       this.dialog = true;
     },
     updateBlog() {
+      this.loading = true;
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           console.log(this.form);
@@ -255,7 +259,7 @@ export default {
             this.list = res.data;
             this.total = res.data.length;
 
-            // 顯示成功提示
+            this.loading = false;
             this.$message.success("編輯成功");
           } else {
             this.$message.error(result.message);
@@ -333,6 +337,13 @@ export default {
   padding: 20px;
   background-color: #fff;
   width: 100%;
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
   .el-scrollbar {
     padding-top: 10px;
     height: 70vh;

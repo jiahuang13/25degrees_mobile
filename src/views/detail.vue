@@ -1,6 +1,5 @@
 <template>
   <div class="detail">
-    <div id="fb-root"></div>
     <!-- 頂部 nav -->
     <van-nav-bar fixed :border="false">
       <template #left>
@@ -35,30 +34,32 @@
         <van-icon name="ellipsis" size="20" class="right" />
       </template>
     </van-nav-bar>
-    <!-- 輪播圖 -->
-    <van-swipe class="carousell">
-      <van-swipe-item>
-        <img :src="item.img" />
-      </van-swipe-item>
-    </van-swipe>
-    <!-- 商品資訊 -->
-    <div class="info">
-      <div class="name">
-        {{ item.name }}
-        <span class="discount">{{ item.discount }}折</span>
+
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
+    <div v-else>
+      <!-- 輪播圖 -->
+      <van-swipe class="carousell">
+        <van-swipe-item>
+          <img :src="item.img" />
+        </van-swipe-item>
+      </van-swipe>
+      <!-- 商品資訊 -->
+      <div class="info">
+        <div class="name">
+          {{ item.name }}
+          <span class="discount">{{ item.discount }}折</span>
+        </div>
+        <div class="discoutPrice">${{ discoutPrice }}</div>
+        <div class="originalPrice">${{ item.price }}</div>
+        <van-divider>商品詳情</van-divider>
+        <div class="content" v-html="item.content"></div>
       </div>
-      <div class="discoutPrice">${{ discoutPrice }}</div>
-      <div class="originalPrice">${{ item.price }}</div>
-      <van-divider>商品詳情</van-divider>
-      <div class="content" v-html="item.content"></div>
     </div>
+
     <!-- 底部nav -->
     <van-goods-action>
-      <van-goods-action-icon
-        icon="share-o"
-        text="分享"
-        @click="showShare = true"
-      />
+      <van-goods-action-icon icon="share-o" text="分享" @click="share = true" />
       <van-goods-action-icon
         icon="star"
         text="已收藏"
@@ -78,13 +79,22 @@
         @click="skuShow = true"
       />
     </van-goods-action>
+
     <!-- 分享面板 -->
-    <van-share-sheet
-      v-model="showShare"
-      title="立即分享给好友"
-      :options="shareOptions"
-      @select="shareSelect"
-    />
+    <van-action-sheet v-model="share" title="分享商品">
+      <div class="sns">
+        <div
+          v-for="item in sns"
+          :key="item.id"
+          class="item"
+          @click="onShare(item.id)"
+        >
+          <van-image width="3rem" height="3rem" :src="item.img" />
+          <div>{{ item.name }}</div>
+        </div>
+      </div>
+    </van-action-sheet>
+
     <!-- sku 簡單版無規格 -->
     <van-action-sheet v-model="skuShow" closeable>
       <div class="content">
@@ -120,35 +130,25 @@ export default {
   name: "detailPage",
   data() {
     return {
+      loading: true,
       item: {},
       like: false,
-      showShare: false,
-      shareOptions: [
+      share: false,
+      sns: [
+        { id: 1, name: "複製連結", img: require("@/assets/image/link.png") },
         {
+          id: 2,
           name: "Facebook",
-          icon: "https://i.ibb.co/xY2cTk5/facebook-logo.png",
+          img: require("@/assets/image/facebook.png"),
         },
-        { name: "Line", icon: "https://i.ibb.co/GHkMPys/line-logo.png" },
-        { name: "複製連結", icon: "link" },
-        { name: "二维码", icon: "qrcode" },
+        { id: 3, name: "Line", img: require("@/assets/image/line.png") },
       ],
-      shareUrl: "https://youzan.github.io/vant/v2/#/zh-CN/icon",
-      sdkLoaded: false,
       skuShow: false,
       count: 1,
+      url: window.location.href, // 直接取得當前頁面的完整 URL
     };
   },
   computed: {
-    facebookShareUrl() {
-      return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        this.shareUrl
-      )}&src=sdkpreparse`;
-    },
-    lineUrl() {
-      return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(
-        this.shareUrl
-      )}`;
-    },
     discoutPrice() {
       if (this.item.discount) {
         return Math.floor((this.item.price * this.item.discount) / 100);
@@ -164,8 +164,7 @@ export default {
     // console.log(res);
     this.item = res.data;
     // console.log(this.item);
-    await this.facebookSDK();
-    this.sdkLoaded = true;
+    this.loading = false;
   },
   methods: {
     likeToggle() {
@@ -174,24 +173,6 @@ export default {
         this.$toast.success("成功加入收藏");
       } else {
         this.$toast.success("取消收藏");
-      }
-    },
-    facebookSDK() {
-      const script = document.createElement("script");
-      script.async = true;
-      script.defer = true;
-      script.crossorigin = "anonymous";
-      script.src =
-        "https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v19.0";
-      script.nonce = "sNkUCo1v";
-      document.getElementById("fb-root").appendChild(script);
-    },
-    shareSelect(option, index) {
-      console.log(option, index);
-      if (index === 0) {
-        window.open(this.facebookShareUrl, "_blank");
-      } else if (index === 1) {
-        window.open(this.lineUrl, "_blank");
       }
     },
     addToCart() {
@@ -205,12 +186,55 @@ export default {
         this.count = 1;
       }, "1000");
     },
+    onShare(platform) {
+      const url = encodeURIComponent(this.url); // 將 URL 編碼
+      // const title = encodeURIComponent(this.blogTitle);
+      let shareUrl = "";
+
+      switch (platform) {
+        case 1:
+          this.copyLink(this.url);
+          this.share = false;
+          break;
+        case 2:
+          // Facebook 分享
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+          window.open(shareUrl, "_blank");
+          this.share = false;
+          break;
+        case 3:
+          // Line 分享
+          shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}`;
+          window.open(shareUrl, "_blank");
+          this.share = false;
+          break;
+        default:
+          this.share = false;
+          return;
+      }
+    },
+    async copyLink(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.$toast.success("已複製到剪貼板");
+      } catch (err) {
+        console.error("複製失敗：", err);
+        this.$toast.fail("複製失敗，請手動選取文字複製！");
+      }
+    },
   },
 };
 </script>
 
 <style>
 .detail {
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
   .van-swipe__indicator--active {
     background-color: #18a999;
   }
@@ -281,7 +305,7 @@ export default {
   }
   .van-action-sheet__content {
     padding: 16px 16px;
-    height: 30vh;
+    /* height: 30vh; */
     .content {
       .top {
         display: flex;
@@ -325,6 +349,19 @@ export default {
         position: absolute;
         bottom: 10px;
         width: 90vw;
+      }
+    }
+  }
+  .sns {
+    display: flex;
+    justify-content: space-around;
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
+      .van-image {
+        padding-bottom: 10px;
       }
     }
   }

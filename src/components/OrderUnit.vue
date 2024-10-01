@@ -37,6 +37,7 @@ export default {
         shipped: "待收貨",
         delivered: "已完成",
         refunded: "退貨/退款",
+        canceled: "不成立",
       },
       actionMap: {
         pending: "去付款",
@@ -44,6 +45,7 @@ export default {
         shipped: "確認收貨",
         delivered: "評價",
         refunded: "退貨/退款詳情",
+        canceled: "再買一次",
       },
     };
   },
@@ -70,7 +72,13 @@ export default {
   },
   methods: {
     actionFn() {
-      console.log(this.order);
+      // console.log(this.order.status === "pending");
+      if (this.order.status === "pending") {
+        this.$router.push({
+          name: "payment",
+          params: { orderId: this.order.id },
+        });
+      }
     },
   },
 };
@@ -83,6 +91,7 @@ export default {
   .van-cell.unit {
     margin-top: 1px;
     padding: 5px 16px;
+    white-space: nowrap;
   }
   .button {
     background-color: #fff;

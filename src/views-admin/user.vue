@@ -30,30 +30,33 @@
       >
     </div>
     <!-- 表格 -->
-    <div class="table">
-      <el-table style="width: 100%" :data="list" empty-text="沒有符合資料">
-        <el-table-column label="ID" prop="id" width="50" />
-        <el-table-column label="帳號" prop="username" />
-        <el-table-column label="email" prop="email" />
-        <el-table-column label="註冊時間" prop="created_at" />
-        <el-table-column
-          label="權限"
-          prop="role"
-          :formatter="formatRole"
-          width="150"
-        />
-        <el-table-column label="操作" fixed="right" width="150">
-          <template #default="scope">
-            <el-button size="mini" type="text" @click="editUser(scope.row.id)"
-              >編輯</el-button
-            >
-            <el-button size="mini" type="text" @click="delUser(scope.row)"
-              >刪除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+    <el-scrollbar always>
+      <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+      <div class="table" v-else>
+        <el-table style="width: 100%" :data="list" empty-text="沒有符合資料">
+          <el-table-column label="ID" prop="id" width="50" />
+          <el-table-column label="帳號" prop="username" />
+          <el-table-column label="email" prop="email" />
+          <el-table-column label="註冊時間" prop="created_at" />
+          <el-table-column
+            label="權限"
+            prop="role"
+            :formatter="formatRole"
+            width="150"
+          />
+          <el-table-column label="操作" fixed="right" width="150">
+            <template #default="scope">
+              <el-button size="mini" type="text" @click="editUser(scope.row.id)"
+                >編輯</el-button
+              >
+              <el-button size="mini" type="text" @click="delUser(scope.row)"
+                >刪除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-scrollbar>
 
     <!-- 編輯對話框 -->
     <el-dialog
@@ -108,6 +111,7 @@ export default {
   name: "adminUser",
   data() {
     return {
+      loading: true,
       list: [], // 會員列表
       // 请求参数
       search: {
@@ -164,8 +168,9 @@ export default {
       },
     };
   },
-  mounted() {
-    this.getList();
+  async mounted() {
+    await this.getList();
+    this.loading = false;
   },
   methods: {
     async getList() {
@@ -226,6 +231,8 @@ export default {
       this.editDialog = true;
     },
     updateUser() {
+      this.loading = true;
+
       this.$refs.editForm.validate(async (valid) => {
         if (valid) {
           // console.log(this.editForm);
@@ -241,6 +248,7 @@ export default {
             // console.log(res)
             this.list = res.data;
             // 顯示成功提示
+            this.loading = false;
             this.$message.success("編輯成功");
           } else {
             this.$message.error(result.message);
@@ -287,6 +295,13 @@ export default {
 .adminUser {
   padding: 20px;
   background-color: #fff;
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
 }
 
 .search-container {

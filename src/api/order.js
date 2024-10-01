@@ -18,7 +18,7 @@ export const paypalVerifyAPI = (orderId, paypalId) => {
 
 export const createOrderAPI = (data) => {
   return request({
-    url: "/createOrder",
+    url: "/order/create",
     method: "POST",
     data,
   });
@@ -27,13 +27,20 @@ export const createOrderAPI = (data) => {
 // 獲取某會員所有訂單
 export const getAllOrdersAPI = () => {
   return request({
-    url: "/getAllOrdersById",
+    url: "/order",
   });
 };
 
 // 獲取某會員一筆訂單
 export const getOneOrderById = (id) => {
   return request({
-    url: `/getOneOrderById/${id}`,
+    url: `/order/${id}`,
+  });
+};
+
+//
+export const getOrderStatusCountAPI = () => {
+  return request({
+    url: "/order/status",
   });
 };

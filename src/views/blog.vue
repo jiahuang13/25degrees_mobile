@@ -13,7 +13,7 @@
     <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
 
     <!-- blog列表 -->
-    <div v-else>
+    <div class="padding-bottom" v-else>
       <van-row>
         <van-col span="24" v-for="item in list" :key="item.id"
           ><BlogCard :item="item"></BlogCard
@@ -62,7 +62,7 @@ export default {
 
 <style lang="less">
 .blog {
-  margin-bottom: 70px;
+  // margin-bottom: 70px;
   .van-loading {
     position: fixed;
     top: 50%;
@@ -75,6 +75,9 @@ export default {
   }
   .van-swipe__indicator--active {
     background-color: #18a999;
+  }
+  .padding-bottom {
+    padding-bottom: 50px;
   }
 }
 </style>

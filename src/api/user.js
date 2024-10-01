@@ -28,6 +28,13 @@ export const loginAPI = (data) => {
   });
 };
 
+// 獲取會員資料
+export const getUserByAuthAPI = () => {
+  return request({
+    url: "/user",
+  });
+};
+
 // ---------------- 地址 ---------------------
 //新增地址
 export const addAddressAPI = (data) => {

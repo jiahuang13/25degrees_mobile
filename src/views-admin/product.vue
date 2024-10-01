@@ -33,9 +33,11 @@
       <el-button type="primary" @click="addNewProduct">新增商品</el-button>
       <!-- <el-button @click="delAllCard">批量删除</el-button> -->
     </div>
+
     <el-scrollbar always>
+      <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
       <!-- 表格 -->
-      <div class="table">
+      <div class="table" v-else>
         <el-table
           style="width: 100%"
           :data="list"
@@ -76,7 +78,7 @@
               <div class="overflow-hidden" v-html="scope.row.content"></div>
             </template>
           </el-table-column>
-          <el-table-column prop="count" label="庫存" align="center">
+          <el-table-column prop="stock" label="庫存" align="center">
           </el-table-column>
           <el-table-column label="操作" fixed="right" width="80" align="center">
             <template #default="scope">
@@ -133,11 +135,16 @@
             <img :src="form.img" alt="" width="300px" height="auto" />
           </div>
         </el-form-item>
-        <el-form-item label="庫存量" prop="count">
-          <el-input v-model="form.count"></el-input>
+        <el-form-item label="庫存量" prop="stock">
+          <el-input v-model="form.stock"></el-input>
         </el-form-item>
         <el-form-item label="前台顯示" prop="visible">
-          <el-switch v-model="form.visible"> </el-switch>
+          <el-switch
+            v-model="form.visible"
+            :active-value="1"
+            :inactive-value="0"
+          >
+          </el-switch>
         </el-form-item>
         <el-form-item label="商品類別" prop="category">
           <el-radio-group v-model="form.category">
@@ -182,6 +189,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       list: [], // 商品列表
       // 请求参数
       search: {
@@ -220,7 +228,7 @@ export default {
         content: "",
         img: "",
         category: 0,
-        count: "",
+        stock: "",
         visible: 1,
       },
       emptyForm: {
@@ -230,7 +238,7 @@ export default {
         content: "",
         img: "",
         category: 0,
-        count: "",
+        stock: "",
         visible: 1,
       },
       rules: {
@@ -252,7 +260,7 @@ export default {
             trigger: "blur",
           },
         ],
-        count: [
+        stock: [
           {
             required: true,
             pattern: /^[1-9]\d*$/,
@@ -271,8 +279,9 @@ export default {
       },
     };
   },
-  mounted() {
-    this.getList();
+  async mounted() {
+    await this.getList();
+    this.loading = false;
   },
   methods: {
     async getList() {
@@ -329,6 +338,7 @@ export default {
       this.dialog = true;
     },
     updateProduct() {
+      this.loading = true;
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           console.log(this.form);
@@ -341,7 +351,7 @@ export default {
             const res = await getAllProductAPI();
             console.log(res);
             this.list = res.data;
-            // 顯示成功提示
+            this.loading = false;
             this.$message.success("編輯成功");
           } else {
             this.$message.error(result.message);
@@ -421,6 +431,13 @@ export default {
   padding: 20px;
   background-color: #fff;
   width: 100%;
+  .van-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
   .el-scrollbar {
     padding-top: 10px;
     height: 70vh;
