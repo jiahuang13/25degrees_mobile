@@ -31,17 +31,12 @@
         :rules="[
           {
             pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            message: '請輸入有效的電子信箱',
+            message: '電子信箱格式錯誤',
           },
         ]"
       />
       <div style="margin: 16px">
-        <van-button
-          round
-          block
-          type="info"
-          native-type="submit"
-          @submit="submit"
+        <van-button round block type="info" native-type="submit"
           >提交</van-button
         >
       </div>
@@ -68,12 +63,19 @@ export default {
   },
   methods: {
     async submit() {
+      this.$toast.loading({
+        message: "加載中...",
+        forbidClick: true,
+        duration: 5000,
+      });
       try {
         const res = await registerAPI(this.form);
         console.log(res);
         this.$toast.success(res.message);
-        localStorage.setItem("userEmail", this.form.email);
-        this.$router.push("/vCode");
+        this.$router.push({
+          name: "vCode",
+          params: { fromRegister: true, email: this.form.email },
+        });
       } catch (err) {
         console.error(err);
       }

@@ -94,8 +94,18 @@ const routes = [
   { path: "/register", component: () => import("@/views/register.vue") },
   {
     path: "/vCode",
+    name: "vCode",
     component: () => import("@/views/vCode.vue"),
-    meta: { requireVerification: true },
+    meta: { requireVCdoe: true },
+  },
+  {
+    path: "/forgotPassword",
+    component: () => import("@/views/forgotPassword.vue"),
+  },
+  {
+    path: "/resetPassword",
+    name: "resetPassword",
+    component: () => import("@/views/resetPassword.vue"),
   },
 
   // 後台管理系統
@@ -147,7 +157,7 @@ router.beforeEach((to, from, next) => {
   const requiresOrder = to.meta.requiresOrder || false; // 判斷是否需要結帳驗證
   const requiresPayment = to.meta.requiresPayment || false; // 判斷是否需要付款驗證
   const requireOrderStatus = to.meta.requireOrderStatus || false;
-  const requireVerification = to.meta.requireVerification || false;
+  const requireVCdoe = to.meta.requireVCdoe || false;
 
   // 未授權情況且目標路由需要授權，跳轉至登入頁面
   if (requiresAuth && !hasAuth) {
@@ -181,7 +191,10 @@ router.beforeEach((to, from, next) => {
     return next("/order");
   }
 
-  if (requireVerification && !from.path === "/register") {
+  if (
+    (requireVCdoe && !from.path === "/register") ||
+    (requireVCdoe && !from.path === "/forgotPassword")
+  ) {
     return next("/register");
   } else {
     next();

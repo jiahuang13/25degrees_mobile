@@ -1,6 +1,11 @@
 <template>
   <div class="vCode">
-    <van-nav-bar title="提交驗證碼" left-text="返回" left-arrow />
+    <van-nav-bar
+      title="提交驗證碼"
+      left-text="返回"
+      left-arrow
+      @click-left="$router.go(-1)"
+    />
     <!-- 驗證碼輸入框 -->
     <van-password-input
       :value="vCode"
@@ -15,15 +20,15 @@
       :show="showKeyboard"
       @blur="showKeyboard = false"
     />
-    <!-- 回註冊業 -->
+    <!-- 回註冊業
     <p class="text">
       點我回 <span @click="$router.push('/register')">註冊</span> 頁
-    </p>
+    </p> -->
   </div>
 </template>
 
 <script>
-import { vCodeAPI } from "@/api/user";
+import { vCodeRegisterAPI, vCodeForgotPasswordAPI } from "@/api/user";
 export default {
   data() {
     return {
@@ -42,18 +47,32 @@ export default {
   },
   methods: {
     async submit() {
-      const email = localStorage.getItem("userEmail");
-      const data = { email, vCode: this.vCode };
-      try {
-        const res = await vCodeAPI(data);
-        console.log(res);
+      const email = this.$route.params.email;
+      const obj = { email, vCode: this.vCode };
+      console.log(obj);
 
-        this.$toast.success(res.message);
-        this.$router.push("/login");
-      } catch (err) {
-        console.error(err);
-        if (err.response.data.message === "驗證碼已過期或無效，請重新註冊") {
-          this.$router.push("/register");
+      // 註冊驗證
+      if (this.$route.params.fromRegister) {
+        try {
+          const res = await vCodeRegisterAPI(obj);
+          console.log(res);
+
+          this.$toast.success(res.message);
+          this.$router.push("/login");
+        } catch (err) {
+          console.error(err);
+          if (err.response.data.message === "驗證碼已過期或無效，請重新註冊") {
+            this.$router.push("/register");
+          }
+        }
+      } else {
+        // 忘記密碼驗證
+        try {
+          const res = await vCodeForgotPasswordAPI(obj);
+          console.log(res);
+          this.$router.push({ name: "resetPassword", params: { email } });
+        } catch (err) {
+          console.log(err);
         }
       }
     },

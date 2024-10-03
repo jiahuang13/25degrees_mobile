@@ -1,72 +1,73 @@
 <template>
-  <div class="login">
-    <van-nav-bar title="登入">
+  <div class="resetPassword">
+    <van-nav-bar title="設定新密碼">
       <template #left>
         <van-icon
           name="arrow-left"
           size="18"
           color="#18a999"
-          @click="$router.push('/home')"
+          @click="$router.push('/login')"
         />
       </template>
     </van-nav-bar>
     <van-form validate-trigger="onBlur" validate-first @submit="submit">
       <van-field
-        v-model="form.username"
-        name="username"
-        placeholder="帳號"
-        :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
-      />
-      <van-field
         v-model="form.password"
         name="password"
         type="password"
-        placeholder="密碼"
+        placeholder="輸入新密碼"
+        :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
+      />
+      <van-field
+        v-model="form.confirmPassword"
+        name="confirmPassword"
+        type="password"
+        placeholder="再次輸入新密碼"
         :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
       />
       <div style="margin: 16px">
-        <van-button round block type="info" native-type="submit"
+        <van-button
+          round
+          block
+          type="info"
+          native-type="submit"
+          :disabled="
+            form.password === '' ||
+            form.confirmPassword === '' ||
+            form.password !== form.confirmPassword
+          "
           >提交</van-button
         >
       </div>
     </van-form>
-    <div class="flex">
-      <p class="text">
-        還沒有帳號？點我 <span @click="$router.push('/register')">註冊</span>
-      </p>
-      <p class="text">
-        <span @click="$router.push('/forgotPassword')">忘記密碼</span>
-      </p>
-    </div>
   </div>
 </template>
 
 <script>
-import { loginAPI } from "@/api/user";
-import { setToken } from "@/utils/auth";
+import { resetPasswordAPI } from "@/api/user";
 
 export default {
-  name: "registerPage",
+  name: "resetPassword",
   data() {
     return {
       form: {
-        username: "",
         password: "",
+        confirmPassword: "",
       },
     };
   },
   methods: {
     async submit() {
       try {
-        const res = await loginAPI(this.form);
-        // console.log(res);
-        this.$toast.success("登入成功，正在跳轉首頁...");
-        console.log(res);
+        const obj = {
+          email: this.$route.params.email,
+          password: this.form.password,
+        };
 
-        setToken(res.data.token);
-        // 獲取 URL 中的 `redirect` 參數，如果沒有則跳轉到首頁
-        const redirect = this.$route.query.redirect || "/home";
-        this.$router.push(redirect);
+        const res = await resetPasswordAPI(obj);
+        console.log(res);
+        this.$toast.success(res.message);
+        this.$router.push("/login");
       } catch (err) {
         console.error(err);
       }
@@ -79,7 +80,7 @@ export default {
 </script>
 
 <style>
-.login {
+.resetPassword {
   /* text-align: center; */
   .flex {
     margin: 0 auto;
