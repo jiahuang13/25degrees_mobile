@@ -20,7 +20,17 @@ export default {
       localStorage.setItem("25degrees_cart", JSON.stringify(state.list));
     },
     addProduct(state, item) {
-      state.list.push(item);
+      // 檢查 list 中是否已存在相同 id 的商品
+      const existingProduct = state.list.find(
+        (product) => product.id === item.id
+      );
+      if (existingProduct) {
+        // 如果已存在，則增加商品數量
+        existingProduct.count += item.count;
+      } else {
+        // 否則，新增商品到購物車列表
+        state.list.push(item);
+      }
       localStorage.setItem("25degrees_cart", JSON.stringify(state.list));
     },
     deleteProduct(state, id) {

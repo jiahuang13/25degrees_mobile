@@ -205,7 +205,7 @@ export default {
         .then(async () => {
           try {
             const res = await deleteUserAPI(row.id);
-            if (res.status === 200) {
+            if (res) {
               this.getList();
               this.$message({
                 type: "success",
@@ -240,7 +240,7 @@ export default {
           const result = await updateUserAPI(this.editForm);
           console.log(result);
 
-          if (result.status === 200) {
+          if (result) {
             // 關閉彈框
             this.editDialog = false;
             // 重新取得會員資料

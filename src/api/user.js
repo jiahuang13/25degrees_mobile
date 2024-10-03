@@ -4,16 +4,16 @@ import request from "@/utils/request";
 // 註冊（data包含帳號、密碼、電子信箱）
 export const registerAPI = (data) => {
   return request({
-    url: "/register",
+    url: "/user/register",
     method: "POST",
     data,
   });
 };
 
 // 驗證碼
-export const verificationCodeAPI = (data) => {
+export const vCodeAPI = (data) => {
   return request({
-    url: "/verificationCode",
+    url: "/user/vCode",
     method: "POST",
     data,
   });
@@ -22,7 +22,7 @@ export const verificationCodeAPI = (data) => {
 // 登入
 export const loginAPI = (data) => {
   return request({
-    url: "/login",
+    url: "/user/login",
     method: "POST",
     data,
   });
@@ -31,47 +31,7 @@ export const loginAPI = (data) => {
 // 獲取會員資料
 export const getUserByAuthAPI = () => {
   return request({
-    url: "/user",
-  });
-};
-
-// ---------------- 地址 ---------------------
-//新增地址
-export const addAddressAPI = (data) => {
-  return request({
-    url: "/addAddress",
-    method: "POST",
-    data,
-  });
-};
-
-// 獲取地址list
-export const getAddressListAPI = () => {
-  return request({
-    url: "/addressList",
-  });
-};
-
-// 獲取單一地址
-export const getAddressOneAPI = (id) => {
-  return request({
-    url: `/address/${id}`,
-  });
-};
-
-//獲取預設地址
-export const getDefaultAddressAPI = () => {
-  return request({
-    url: "/addressDefault",
-  });
-};
-
-// 更新地址
-export const updateAddressAPI = (id, data) => {
-  return request({
-    url: `/address/${id}`,
-    method: "PATCH",
-    data,
+    url: "/user/auth",
   });
 };
 
@@ -79,21 +39,21 @@ export const updateAddressAPI = (id, data) => {
 // 獲取所有會員資料
 export const getAllUserAPI = () => {
   return request({
-    url: "/user/all",
+    url: "/admin/user/all",
   });
 };
 
 // 獲取單筆會員資料
 export const getUserByIdAPI = (id) => {
   return request({
-    url: `/user/${id}`,
+    url: `/admin/user/${id}`,
   });
 };
 
 // 刪除會員
 export const deleteUserAPI = (id) => {
   return request({
-    url: `/user/${id}`,
+    url: `/admin/user/${id}`,
     method: "DELETE",
   });
 };
@@ -101,7 +61,7 @@ export const deleteUserAPI = (id) => {
 // 更新會員資料
 export const updateUserAPI = (data) => {
   return request({
-    url: "/user",
+    url: "/admin/user",
     method: "PATCH",
     data,
   });
@@ -110,7 +70,7 @@ export const updateUserAPI = (data) => {
 // 會員搜尋
 export const searchUserAPI = (params) => {
   return request({
-    url: "/user/search",
+    url: "/admin/user/search",
     params,
   });
 };

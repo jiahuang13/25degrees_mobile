@@ -11,51 +11,55 @@
         />
       </template>
     </van-nav-bar>
-    <div class="list">
-      <van-cell-group>
-        <van-cell
-          v-for="item in addressList"
-          :key="item.id"
-          clickable
-          center
-          @click="select(item)"
+
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
+    <div v-else>
+      <div class="list">
+        <van-cell-group>
+          <van-cell
+            v-for="item in addressList"
+            :key="item.id"
+            clickable
+            center
+            @click="select(item)"
+          >
+            <template #title>
+              <div>
+                {{ item.recipient_name }} {{ item.phone }}
+                <van-tag type="danger" v-if="item.is_default === 1"
+                  >預設</van-tag
+                >
+              </div>
+            </template>
+            <template #right-icon>
+              <van-icon
+                v-if="!$route.query.select"
+                name="edit"
+                @click.stop="edit(item.id)"
+              />
+            </template>
+            <template #label>
+              <div>{{ item.address }}</div>
+            </template>
+          </van-cell>
+        </van-cell-group>
+        <van-button block round class="addButton" @click="addressAdd"
+          >新增地址</van-button
         >
-          <template #title>
-            <div>
-              {{ item.recipient_name }} {{ item.phone }}
-              <van-tag type="danger" v-if="item.is_default === 1">預設</van-tag>
-            </div>
-          </template>
-          <template #right-icon>
-            <van-icon
-              v-if="!$route.query.select"
-              name="edit"
-              @click.stop="edit(item.id)"
-            />
-          </template>
-          <template #label>
-            <div>{{ item.address }}</div>
-          </template>
-        </van-cell>
-      </van-cell-group>
-      <van-button
-        block
-        round
-        class="addButton"
-        @click="$router.push('/addressAdd')"
-        >新增地址</van-button
-      >
+      </div>
+      <van-empty description="目前沒有地址" v-if="addressList.length == 0" />
     </div>
-    <div class="empty" v-if="addressList.length == 0">目前沒有地址</div>
   </div>
 </template>
 
 <script>
-import { getAddressListAPI } from "@/api/user";
+import { getAddressListAPI } from "@/api/address";
 export default {
   name: "addressPage",
   data() {
     return {
+      loading: true,
       defaultOne: "0",
       //結帳頁面跳過來選擇
       checkOutSelect: false,
@@ -76,18 +80,28 @@ export default {
         });
       }
     },
+    async getAddressList() {
+      // console.log("Route params:", this.$route.params);
+      this.checkOutSelect = this.$route.query.select || false;
+      // 獲取所有地址
+      try {
+        const res = await getAddressListAPI();
+        // console.log(res);
+        this.addressList = res.data;
+      } catch (err) {
+        console.log("獲取地址列表錯誤:", err);
+      }
+    },
+    addressAdd() {
+      if (this.addressList.length === 0) {
+        this.$router.push({ name: "addressAdd", params: { is_default: true } });
+      }
+      this.$router.push({ name: "addressAdd", params: { is_default: false } });
+    },
   },
   async mounted() {
-    // console.log("Route params:", this.$route.params);
-    this.checkOutSelect = this.$route.query.select || false;
-    // 獲取所有地址
-    try {
-      const res = await getAddressListAPI();
-      // console.log(res);
-      this.addressList = res.data;
-    } catch (err) {
-      console.log("獲取地址列表錯誤:", err);
-    }
+    await this.getAddressList();
+    this.loading = false;
   },
 };
 </script>
@@ -97,6 +111,7 @@ export default {
   background-color: #eaeaea48;
   min-height: 100vh;
   .empty {
+    padding-top: 40px;
     text-align: center;
     color: gray;
     font-size: 14px;
@@ -118,5 +133,15 @@ export default {
     background-color: #18a999;
     color: #fff;
   }
+}
+.van-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+.van-empty {
+  padding-top: 20vh;
 }
 </style>

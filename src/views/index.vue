@@ -9,7 +9,10 @@
         <van-icon name="chat-o" size="18" />
       </template>
       <template #title>
-        <van-image width="60" :src="logoSrc" />
+        <van-image
+          width="60"
+          :src="require('@/assets/image/25°C-logo-textonly.png')"
+        />
       </template>
     </van-nav-bar>
 
@@ -85,22 +88,28 @@ export default {
       bodyList: [],
       faceList: [],
       oilList: [],
-      logoSrc: require("@/assets/image/25°C-logo-textonly.png"),
       loading: true,
     };
   },
   async mounted() {
-    const res = await getAllProductAPI();
-    console.log(res);
-    const data = res.data;
-
-    this.incenseList = data.filter((ele) => ele.category === 4);
-    this.bodyList = data.filter((ele) => ele.category === 2);
-    this.faceList = data.filter((ele) => ele.category === 3);
-    this.oilList = data.filter((ele) => ele.category === 1);
-    // this.$store.commit("cart/getList");
-
+    await this.getAllProduct();
     this.loading = false;
+  },
+  methods: {
+    async getAllProduct() {
+      try {
+        const res = await getAllProductAPI();
+        console.log(res);
+        const data = res.data;
+
+        this.incenseList = data.filter((ele) => ele.category === 4);
+        this.bodyList = data.filter((ele) => ele.category === 2);
+        this.faceList = data.filter((ele) => ele.category === 3);
+        this.oilList = data.filter((ele) => ele.category === 1);
+      } catch (err) {
+        console.error(err);
+      }
+    },
   },
 };
 </script>

@@ -11,111 +11,125 @@
         />
       </template>
     </van-nav-bar>
-    <van-form
-      class="form"
-      validate-trigger="onBlur"
-      validate-first
-      @submit="submit"
-    >
-      <van-field
-        type="text"
-        v-model="obj.recipient_name"
-        placeholder="收貨人"
-        required
-        :rules="[
-          {
-            required: true,
-            message: '請填寫收貨人',
-          },
-        ]"
-      />
-      <van-field
-        type="tel"
-        v-model="obj.phone"
-        placeholder="手機號碼"
-        required
-        :rules="[
-          {
-            pattern: /^09\d{8}$/,
-            message: '請輸入正確手機格式',
-          },
-        ]"
-      />
-      <van-field
-        v-model="obj.city"
-        is-link
-        readonly
-        required
-        placeholder="城市，鄉鎮地區"
-        @click="show = true"
-        :rules="[
-          {
-            required: true,
-            message: '請選擇城市和鄉鎮地區',
-          },
-        ]"
-      />
-      <!-- 地區彈出層 -->
-      <van-popup v-model="show" round position="bottom">
-        <van-cascader
-          v-model="cascaderValue"
-          title="請選擇所在地區"
-          active-color="#18a999"
-          :options="options"
-          placeholder="請選擇"
-          @close="show = false"
-          @finish="onSelect"
+
+    <van-loading v-if="loading" type="spinner" size="30px" color="#18A999" />
+
+    <div v-else>
+      <van-form
+        class="form"
+        validate-trigger="onBlur"
+        validate-first
+        @submit="submit"
+      >
+        <van-field
+          type="text"
+          v-model="obj.recipient_name"
+          placeholder="收貨人"
+          required
+          :rules="[
+            {
+              required: true,
+              message: '請填寫收貨人',
+            },
+          ]"
         />
-      </van-popup>
+        <van-field
+          type="tel"
+          v-model="obj.phone"
+          placeholder="手機號碼"
+          required
+          :rules="[
+            {
+              pattern: /^09\d{8}$/,
+              message: '請輸入正確手機格式',
+            },
+          ]"
+        />
+        <van-field
+          v-model="obj.city"
+          is-link
+          readonly
+          required
+          placeholder="城市，鄉鎮地區"
+          @click="show = true"
+          :rules="[
+            {
+              required: true,
+              message: '請選擇城市和鄉鎮地區',
+            },
+          ]"
+        />
+        <!-- 地區彈出層 -->
+        <van-popup v-model="show" round position="bottom">
+          <van-cascader
+            v-model="cascaderValue"
+            title="請選擇所在地區"
+            active-color="#18a999"
+            :options="options"
+            placeholder="請選擇"
+            @close="show = false"
+            @finish="onSelect"
+          />
+        </van-popup>
 
-      <van-field
-        type="text"
-        v-model="obj.detail"
-        required
-        placeholder="詳細地址"
-        :rules="[
-          {
-            required: true,
-            message: '請填寫詳細地址',
-          },
-        ]"
-      />
+        <van-field
+          type="text"
+          v-model="obj.detail"
+          required
+          placeholder="詳細地址"
+          :rules="[
+            {
+              required: true,
+              message: '請填寫詳細地址',
+            },
+          ]"
+        />
 
-      <van-cell center title="設為預設地址">
-        <template #right-icon>
-          <van-switch v-model="is_default_boolean" size="24" />
-        </template>
-      </van-cell>
+        <van-cell center title="設為預設地址">
+          <template #right-icon>
+            <van-switch
+              v-model="is_default_boolean"
+              size="24"
+              :disabled="is_default_boolean"
+            />
+          </template>
+        </van-cell>
 
-      <div class="btns">
-        <van-button
-          type="primary"
-          block
-          round
-          color="#18a999"
-          native-type="submit"
-          >提交</van-button
-        >
-        <van-button
-          block
-          round
-          color="#fff"
-          class="delete"
-          v-if="!isAdd"
-          @click="onDelete"
-          >刪除</van-button
-        >
-      </div>
-    </van-form>
+        <div class="btns">
+          <van-button
+            type="primary"
+            block
+            round
+            color="#18a999"
+            native-type="submit"
+            >提交</van-button
+          >
+          <van-button
+            block
+            round
+            color="#fff"
+            class="delete"
+            v-if="!isAdd"
+            @click="onDelete"
+            >刪除</van-button
+          >
+        </div>
+      </van-form>
+    </div>
   </div>
 </template>
 
 <script>
-import { getAddressOneAPI, updateAddressAPI, addAddressAPI } from "@/api/user";
+import {
+  getAddressOneAPI,
+  updateAddressAPI,
+  addAddressAPI,
+} from "@/api/address";
 export default {
   name: "addressEdit",
   data() {
     return {
+      loading: true,
       obj: {
         recipient_name: "",
         phone: "",
@@ -505,50 +519,78 @@ export default {
     // 是新增地址
     if (this.$route.path === "/addressAdd") {
       this.isAdd = true;
+      // 若目前沒有地址則預設打開
+      console.log(this.$route.params.is_default);
+
+      if (this.$route.params.is_default) {
+        this.obj.is_default = 1;
+      }
     } else {
       // 是編輯地址
-      const res = await getAddressOneAPI(this.$route.params.id);
-      console.log(res);
-      this.obj = res.data[0];
+      await this.getAddress();
     }
+    this.loading = false;
   },
   methods: {
+    async getAddress() {
+      try {
+        const res = await getAddressOneAPI(this.$route.params.id);
+        console.log(res);
+        this.obj = res.data;
+      } catch (err) {
+        console.error(err);
+      }
+    },
     onSelect({ selectedOptions }) {
       this.show = false;
       this.obj.city = selectedOptions.map((option) => option.text).join(" ");
     },
     async submit() {
-      // 拼接地址
-      this.obj.address = [
-        this.obj.city.replace(/\s/g, ""),
-        this.obj.detail,
-      ].join("");
+      try {
+        // 拼接地址
+        this.obj.address = [
+          this.obj.city.replace(/\s/g, ""),
+          this.obj.detail,
+        ].join("");
 
-      if (this.isAdd) {
-        // 判斷是新增地址
-        // eslint-disable-next-line no-unused-vars
-        const { id, user_id, ...addObj } = this.obj; // 解构并排除id和user_id
-        console.log(addObj);
-        const res = await addAddressAPI(addObj);
-        console.log(res);
-      } else {
-        // 是編輯地址
-        const res = await updateAddressAPI(this.obj.id, this.obj);
-        console.log(res);
+        // 判斷是新增還是編輯
+        let res;
+        if (this.isAdd) {
+          // 新增地址
+          // eslint-disable-next-line no-unused-vars
+          const { id, user_id, ...addObj } = this.obj; // 解構並排除id和user_id
+          console.log(addObj);
+
+          res = await addAddressAPI(addObj); // 異步操作 1
+          if (this.$route.params.checkOut) {
+            this.$router.push("/checkOut");
+          }
+        } else {
+          // 編輯地址
+          res = await updateAddressAPI(this.obj.id, this.obj); // 異步操作 2
+        }
+
+        if (res) {
+          console.log(res);
+          // this.$router.push("/address"); // 成功後跳轉
+        }
+      } catch (err) {
+        console.error(err.message || err); // 統一捕捉錯誤
+        // 顯示提示訊息
+        this.$toast.fail("操作失敗，請稍後再試");
       }
-      this.$router.push("/address");
     },
+
     onDelete() {
       this.$dialog
         .confirm({
-          message: "刪除地址？",
+          message: "確定刪除地址？",
           showCancelButton: true,
-          confirmButtonText: "刪除",
+          confirmButtonText: "確定",
         })
         .then(() => {
           // on confirm
-          this.$store.commit("user/deleteAddress", this.$route.params.id);
-          this.$router.push("/address");
+          // this.$router.push("/address");
         })
         .catch(() => {});
     },
@@ -580,5 +622,12 @@ export default {
       }
     }
   }
+}
+.van-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 </style>

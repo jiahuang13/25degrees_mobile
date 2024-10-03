@@ -31,9 +31,9 @@ export default {
     },
   },
   actions: {
-    async getSearchHistory(context) {
+    getSearchHistory(context) {
       if (JSON.parse(localStorage.getItem("25dg_search"))) {
-        const res = await JSON.parse(localStorage.getItem("25dg_search"));
+        const res = JSON.parse(localStorage.getItem("25dg_search"));
         context.commit("updateSearchHistory", res);
       } else {
         // console.log("no hisotry");

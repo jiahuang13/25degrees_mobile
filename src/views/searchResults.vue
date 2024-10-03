@@ -82,7 +82,7 @@ export default {
         name: this.$route.query.keyword,
         order: "price",
       });
-      if (res.data.status === 0) {
+      if (res) {
         this.list = res.data.data;
       } else {
         this.list = [];

@@ -60,7 +60,11 @@ const routes = [
     path: "/addressEdit/:id",
     component: () => import("@/views/addressEdit.vue"),
   },
-  { path: "/addressAdd", component: () => import("@/views/addressEdit.vue") },
+  {
+    path: "/addressAdd",
+    name: "addressAdd",
+    component: () => import("@/views/addressEdit.vue"),
+  },
   {
     path: "/order",
     name: "order",
@@ -89,8 +93,9 @@ const routes = [
   { path: "/login", component: () => import("@/views/login.vue") },
   { path: "/register", component: () => import("@/views/register.vue") },
   {
-    path: "/verificationCode",
-    component: () => import("@/views/verificationCode.vue"),
+    path: "/vCode",
+    component: () => import("@/views/vCode.vue"),
+    meta: { requireVerification: true },
   },
 
   // 後台管理系統
@@ -142,6 +147,7 @@ router.beforeEach((to, from, next) => {
   const requiresOrder = to.meta.requiresOrder || false; // 判斷是否需要結帳驗證
   const requiresPayment = to.meta.requiresPayment || false; // 判斷是否需要付款驗證
   const requireOrderStatus = to.meta.requireOrderStatus || false;
+  const requireVerification = to.meta.requireVerification || false;
 
   // 未授權情況且目標路由需要授權，跳轉至登入頁面
   if (requiresAuth && !hasAuth) {
@@ -162,6 +168,8 @@ router.beforeEach((to, from, next) => {
     // Toast.fail("購物車為空，無法訪問結帳頁面");
     return next("/cart");
   }
+  // (requiresOrder && !store.state.cart.checkedList.length) ||
+  // (requiresOrder && !from.path === "/addressAdd")
 
   if (requiresPayment && !to.params.orderId) {
     // Toast.fail("沒有訂單編號，無法訪問付款頁面");
@@ -171,6 +179,10 @@ router.beforeEach((to, from, next) => {
   if (requireOrderStatus && !to.params.status) {
     // Toast.fail("無法訪問付款結果頁面");
     return next("/order");
+  }
+
+  if (requireVerification && !from.path === "/register") {
+    return next("/register");
   } else {
     next();
   }

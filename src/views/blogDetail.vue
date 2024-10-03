@@ -89,26 +89,25 @@ export default {
   methods: {
     async getBlog() {
       const id = this.$route.params.id;
-      const res = await getOneBlogAPI(id);
-      // const res2 = await getThreeRandBlogAPI();
-      if (res && !res.error) {
+      try {
+        const res = await getOneBlogAPI(id);
         console.log(res);
         const { title, content, created_at, img } = res.data;
         const date = new Date(created_at);
         const formattedDate = date.toISOString().substring(0, 10);
 
         this.blog = { ...this.blog, title, content, formattedDate, img };
-      } else {
-        console.log(res.error);
+      } catch (err) {
+        console.error(err);
       }
     },
     async getThreeRandBlog() {
-      const res = await getThreeRandBlogAPI(this.$route.params.id);
-      console.log(res);
-      if (res && !res.error) {
+      try {
+        const res = await getThreeRandBlogAPI(this.$route.params.id);
+        console.log(res);
         this.readmoreList = res.data;
-      } else {
-        console.log(res.error);
+      } catch (err) {
+        console.error(err);
       }
     },
     share(platform) {

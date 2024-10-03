@@ -196,9 +196,12 @@ export default {
     async getList() {
       const res = await getAllBlogAPI();
       console.log(res);
-      if (res && !res.error) {
+      if (res) {
         this.list = res.data;
         this.total = res.data.length;
+      } else {
+        this.list = null;
+        this.total = null;
       }
       // this.total = res.data.length;
     },
@@ -249,10 +252,10 @@ export default {
         if (valid) {
           console.log(this.form);
 
-          const result = await updateBlogAPI(this.form);
-          console.log(result);
+          const res = await updateBlogAPI(this.form);
+          console.log(res);
 
-          if (result.status === 200) {
+          if (res) {
             this.dialog = false;
             const res = await getAllBlogAPI();
             console.log(res);
@@ -262,7 +265,7 @@ export default {
             this.loading = false;
             this.$message.success("編輯成功");
           } else {
-            this.$message.error(result.message);
+            this.$message.error(res.message);
           }
         } else {
           return false;

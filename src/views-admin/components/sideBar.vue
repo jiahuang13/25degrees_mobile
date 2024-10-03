@@ -50,7 +50,7 @@
 </template>
 
 <script>
-// import { removeAdminToken } from "@/utils/auth";
+import { removeToken } from "@/utils/auth";
 export default {
   name: "side-Bar",
   methods: {
@@ -61,7 +61,7 @@ export default {
         type: "warning",
       })
         .then(() => {
-          // removeAdminToken();
+          removeToken();
           this.$message.success("登出成功");
           this.$router.push("/");
         })

@@ -1,33 +1,11 @@
 <template>
-  <div class="register">
-    <van-nav-bar title="註冊" left-text="返回" left-arrow />
+  <div class="forgotPwd">
+    <van-nav-bar title="忘記密碼" left-text="返回" left-arrow />
     <van-form validate-trigger="onBlur" validate-first @submit="submit">
       <van-field
-        v-model="form.username"
-        name="username"
-        placeholder="請輸入帳號，至少5位的數字或英文字母"
-        :rules="[
-          {
-            pattern: /^[0-9a-zA-Z_]{5,}$/,
-            message: '帳號需為至少5位的數字或英文字母',
-          },
-        ]"
-      />
-      <van-field
-        v-model="form.password"
-        name="password"
-        placeholder="請輸入密碼，至少5位的數字或英文字母"
-        :rules="[
-          {
-            pattern: /^[0-9a-zA-Z_]{5,}$/,
-            message: '密碼需為至少5位的數字或英文字母',
-          },
-        ]"
-      />
-      <van-field
-        v-model="form.email"
+        v-model="email"
         name="email"
-        placeholder="請輸入您的電子信箱"
+        placeholder="輸入註冊信箱"
         :rules="[
           {
             pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -42,21 +20,18 @@
           type="info"
           native-type="submit"
           @submit="submit"
-          >提交</van-button
+          >發送驗證碼</van-button
         >
       </div>
     </van-form>
-    <p class="text">
-      已經有帳號？去 <span @click="$router.push('/login')">登入</span>
-    </p>
   </div>
 </template>
 
 <script>
-import { registerAPI } from "@/api/user";
+import { forgotPwdAPI } from "@/api/user";
 
 export default {
-  name: "registerPage",
+  name: "forgotPwdPage",
   data() {
     return {
       form: {
@@ -69,7 +44,7 @@ export default {
   methods: {
     async submit() {
       try {
-        const res = await registerAPI(this.form);
+        const res = await forgotPwdAPI(this.form);
         console.log(res);
         this.$toast.success(res.message);
         localStorage.setItem("userEmail", this.form.email);
@@ -83,7 +58,7 @@ export default {
 </script>
 
 <style>
-.register {
+.forgotPwd {
   .text {
     font-size: 14px;
     text-align: center;

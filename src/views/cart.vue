@@ -42,13 +42,7 @@
       </van-submit-bar>
     </div>
     <!-- 空狀態 -->
-    <div class="empty" v-else>
-      <van-icon
-        name="https://i.ibb.co/qmJfLMF/empty-cart.png"
-        size="100"
-      ></van-icon>
-      <p>購物車是空的，去逛逛吧！</p>
-    </div>
+    <van-empty description="購物車是空的，去逛逛吧！" v-else />
   </div>
 </template>
 
@@ -154,16 +148,8 @@ export default {
       height: 100%;
     }
   }
-  .empty {
-    padding-top: 100px;
-    text-align: center;
-    .van-icon__image {
-      opacity: 30%;
-    }
-    p {
-      color: #878787;
-      font-size: 14px;
-    }
+  .van-empty {
+    padding-top: 20vh;
   }
 }
 </style>

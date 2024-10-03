@@ -108,7 +108,7 @@
           ></van-image>
           <div class="right">
             <div class="price">${{ discoutPrice }}</div>
-            <div class="quota">商品庫存：{{ item.quota }}</div>
+            <div class="quota">商品庫存：{{ item.stock }}</div>
           </div>
         </div>
         <van-divider></van-divider>
@@ -159,14 +159,19 @@ export default {
     ...mapState("cart", ["list"]),
   },
   async mounted() {
-    // console.log(this.$route.params);
-    const res = await getOneProductAPI(this.$route.params.id);
-    // console.log(res);
-    this.item = res.data;
-    // console.log(this.item);
+    await this.getProduct();
     this.loading = false;
   },
   methods: {
+    async getProduct() {
+      try {
+        const res = await getOneProductAPI(this.$route.params.id);
+        console.log(res);
+        this.item = res.data;
+      } catch (err) {
+        console.error(err);
+      }
+    },
     likeToggle() {
       this.like = !this.like;
       if (this.like) {
@@ -228,13 +233,6 @@ export default {
 
 <style>
 .detail {
-  .van-loading {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-  }
   .van-swipe__indicator--active {
     background-color: #18a999;
   }
@@ -325,7 +323,7 @@ export default {
       .bottom {
         display: flex;
         justify-content: space-between;
-        padding-top: 5px;
+        padding-bottom: 40px;
         span {
           font-size: 14px;
         }
@@ -365,5 +363,12 @@ export default {
       }
     }
   }
+}
+.van-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 </style>

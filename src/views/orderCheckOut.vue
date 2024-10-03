@@ -7,18 +7,15 @@
       </template>
     </van-nav-bar>
     <!-- 收貨人 -->
-    <div
-      class="contact"
-      @click="$router.push({ path: '/address', query: { select: true } })"
-    >
+    <div class="contact" @click="addressHandler">
       <van-icon name="location-o" size="18" class="left" color="#18a999" />
-      <div class="info" v-if="contact">
+      <div class="info" v-if="contact.address">
         <div class="top">
           <span>{{ contact.recipient_name }} {{ contact.phone }}</span>
         </div>
         <div class="bottom">{{ contact.address }}</div>
       </div>
-      <div class="empty" v-else>請設定收貨地址</div>
+      <div class="empty" v-else>新增收貨地址</div>
       <van-icon name="arrow" size="18" class="right" color="#eaeaea" />
     </div>
     <!-- 訂單列 -->
@@ -57,7 +54,7 @@
 
 <script>
 import OrderItem from "@/components/OrderItem.vue";
-import { getDefaultAddressAPI, getAddressOneAPI } from "@/api/user";
+import { getDefaultAddressAPI, getAddressOneAPI } from "@/api/address";
 import { createOrderAPI } from "@/api/order";
 import { mapState, mapGetters } from "vuex";
 export default {
@@ -83,32 +80,26 @@ export default {
     ...mapGetters("cart", ["total", "totalPrice", "finalList"]),
   },
   async mounted() {
-    // 如果是從選擇頁面過來，調用選擇的收貨地址
-    if (this.$route.params.selectedId) {
-      try {
-        const res = await getAddressOneAPI(this.$route.params.selectedId);
-        // console.log(res.data[0]);
-        this.contact = res.data[0];
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      // 否則調用預設地址
-      try {
-        const res = await getDefaultAddressAPI();
-        // console.log(res.data[0]);
-        if (res.data && res.data.length > 0) {
-          this.contact = res.data[0];
-        } else {
-          this.contact = null;
-        }
-      } catch (err) {
-        console.error("获取地址失败:", err);
-      }
-    }
+    await this.getAddress();
     this.loading = false;
   },
   methods: {
+    async getAddress() {
+      const id = this.$route.params.selectedId;
+      try {
+        // 如果是從選擇頁面過來，調用選擇的收貨地址
+        if (id) {
+          const res = await getAddressOneAPI(id);
+          this.contact = res.data;
+        } else {
+          // 否則調用預設地址
+          const res = await getDefaultAddressAPI();
+          this.contact = res.data;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
     async submit() {
       // items(id, count, price), totalprice
       const data = {
@@ -119,15 +110,23 @@ export default {
       try {
         const res = await createOrderAPI(data);
         console.log(res);
-        if (res.status === 200) {
-          // 訂單建立成功後：移除購物車中 checkedList 品項
-          this.$store.commit("cart/removeCheckedListFromList");
-          this.orderId = res.orderId;
-        }
+        // 訂單建立成功後：移除購物車中 checkedList 品項
+        this.$store.commit("cart/removeCheckedListFromList");
+        this.orderId = res.data.orderId;
       } catch (err) {
         console.error(err);
       }
       this.$router.push({ name: "payment", params: { orderId: this.orderId } });
+    },
+    addressHandler() {
+      if (this.contact.address) {
+        this.$router.push({ path: "/address", query: { select: true } });
+      } else {
+        this.$router.push({
+          name: "addressAdd",
+          params: { is_default: true, checkOut: true },
+        });
+      }
     },
   },
 };

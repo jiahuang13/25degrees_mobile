@@ -50,10 +50,12 @@ export default {
   },
   methods: {
     async getBlog() {
-      const res = await getAllBlogAPI();
-      if (res && !res.error) {
+      try {
+        const res = await getAllBlogAPI();
         console.log(res);
         this.list = res.data;
+      } catch (err) {
+        console.error(err);
       }
     },
   },

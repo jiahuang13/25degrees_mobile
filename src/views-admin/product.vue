@@ -310,7 +310,7 @@ export default {
         .then(async () => {
           try {
             const res = await deleteProductAPI(row.id);
-            if (res.status === 200) {
+            if (res) {
               this.getList();
               this.$message({
                 type: "success",
@@ -346,7 +346,7 @@ export default {
           const result = await updateProductAPI(this.form);
           console.log(result);
 
-          if (result.status === 200) {
+          if (result) {
             this.dialog = false;
             const res = await getAllProductAPI();
             console.log(res);
@@ -374,7 +374,7 @@ export default {
           const res = await addNewProductAPI(this.form);
           console.log(res);
 
-          if (res.status === 200) {
+          if (res) {
             this.resetForm();
             this.dialog = false;
             const res = await getAllProductAPI();

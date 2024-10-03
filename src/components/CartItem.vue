@@ -1,5 +1,5 @@
 <template>
-  <div class="CartItem" @click="$router.push(`/detail/${item.id}`)">
+  <div class="CartItem">
     <!-- 勾選框 -->
     <div class="checkbox-wrapper">
       <div class="round">
@@ -12,12 +12,6 @@
         <label :for="`checkbox${index}`"></label>
       </div>
     </div>
-    <!-- <input
-      type="checkbox"
-      @click="checkToggle"
-      :checked="selected"
-      id="checkbox-18"
-    /> -->
 
     <!-- 圖片 -->
     <van-image
@@ -26,12 +20,15 @@
       fit="cover"
       radius="5px"
       :src="item.img"
+      @click="$router.push(`/detail/${item.id}`)"
     />
     <!-- info -->
     <div class="info">
-      <div class="title">{{ item.name }}</div>
+      <div class="title" @click="$router.push(`/detail/${item.id}`)">
+        {{ item.name }}
+      </div>
       <div class="info-down">
-        <div class="price">
+        <div class="price" @click="$router.push(`/detail/${item.id}`)">
           <div class="discoutPrice">${{ discountPrice }}</div>
           <div class="originalPrice">${{ item.price }}</div>
         </div>

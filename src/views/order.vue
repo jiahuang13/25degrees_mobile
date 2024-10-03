@@ -34,10 +34,7 @@
           </div>
         </div>
         <!-- 空狀態 -->
-        <div class="empty" v-else>
-          <van-icon name="notes-o" size="70" color="#878787"></van-icon>
-          <p>尚未有訂單</p>
-        </div>
+        <van-empty description="尚未有訂單" v-else />
       </van-tab>
     </van-tabs>
   </div>

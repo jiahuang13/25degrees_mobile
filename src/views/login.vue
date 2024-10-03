@@ -14,13 +14,14 @@
       <van-field
         v-model="form.username"
         name="username"
-        placeholder="請輸入帳號"
+        placeholder="帳號"
         :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
       />
       <van-field
         v-model="form.password"
         name="password"
-        placeholder="請輸入密碼"
+        type="password"
+        placeholder="密碼"
         :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
       />
       <div style="margin: 16px">
@@ -34,9 +35,14 @@
         >
       </div>
     </van-form>
-    <p class="text">
-      還沒有帳號？點我 <span @click="$router.push('/register')">註冊</span>
-    </p>
+    <div>
+      <p class="text">
+        還沒有帳號？點我 <span @click="$router.push('/register')">註冊</span>
+      </p>
+      <p class="text">
+        <span @click="$router.push('/register')">忘記密碼</span>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -56,16 +62,18 @@ export default {
   },
   methods: {
     async submit() {
-      const res = await loginAPI(this.form);
-      // console.log(res);
-      if (res.status === 200) {
-        this.$toast.success("登入成功");
-        setToken(res.token);
+      try {
+        const res = await loginAPI(this.form);
+        // console.log(res);
+        this.$toast.success("登入成功，正在跳轉首頁...");
+        console.log(res);
+
+        setToken(res.data.token);
         // 獲取 URL 中的 `redirect` 參數，如果沒有則跳轉到首頁
         const redirect = this.$route.query.redirect || "/home";
         this.$router.push(redirect);
-      } else {
-        this.$toast.fail(res.message);
+      } catch (err) {
+        console.error(err);
       }
     },
     validator(val) {

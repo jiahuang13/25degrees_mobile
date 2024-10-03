@@ -1,9 +1,9 @@
 <template>
-  <div class="verificationCode">
+  <div class="vCode">
     <van-nav-bar title="提交驗證碼" left-text="返回" left-arrow />
     <!-- 驗證碼輸入框 -->
     <van-password-input
-      :value="verificationCode"
+      :value="vCode"
       :mask="false"
       :focused="showKeyboard"
       @focus="showKeyboard = true"
@@ -11,7 +11,7 @@
     />
     <!-- 数字键盘 -->
     <van-number-keyboard
-      v-model="verificationCode"
+      v-model="vCode"
       :show="showKeyboard"
       @blur="showKeyboard = false"
     />
@@ -23,16 +23,16 @@
 </template>
 
 <script>
-import { verificationCodeAPI } from "@/api/user";
+import { vCodeAPI } from "@/api/user";
 export default {
   data() {
     return {
-      verificationCode: "",
+      vCode: "",
       showKeyboard: true,
     };
   },
   watch: {
-    verificationCode(newVal) {
+    vCode(newVal) {
       // 當驗證碼長度達到 6 位時，執行自動提交
       if (newVal.length === 6) {
         this.submit();
@@ -43,16 +43,18 @@ export default {
   methods: {
     async submit() {
       const email = localStorage.getItem("userEmail");
-      const data = { email, verificationCode: this.verificationCode };
+      const data = { email, vCode: this.vCode };
+      try {
+        const res = await vCodeAPI(data);
+        console.log(res);
 
-      const res = await verificationCodeAPI(data);
-      console.log(res);
-
-      if (res.data.status === 200) {
-        this.$toast.success(res.data.message);
+        this.$toast.success(res.message);
         this.$router.push("/login");
-      } else {
-        this.$toast.fail(res.data.message);
+      } catch (err) {
+        console.error(err);
+        if (err.response.data.message === "驗證碼已過期或無效，請重新註冊") {
+          this.$router.push("/register");
+        }
       }
     },
   },
@@ -60,7 +62,7 @@ export default {
 </script>
 
 <style>
-.verificationCode {
+.vCode {
   .text {
     font-size: 14px;
     text-align: center;

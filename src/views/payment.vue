@@ -62,8 +62,8 @@ export default {
     async createOrder() {
       try {
         const res = await paypalCreateAPI(this.amount);
-        console.log("Order ID from backend:", res.id); // 打印订单ID
-        return res.id; // 返回创建的订单 ID
+        // console.log("Order ID from backend:", res.data.id); // 打印订单ID
+        return res.data.id; // 返回创建的订单 ID
       } catch (error) {
         console.error("Failed to create order", error);
       }
@@ -87,7 +87,7 @@ export default {
               const res = await paypalVerifyAPI(vm.orderId, vm.paypalId);
               console.log(res);
 
-              const paymentStatus = res.status === 200 ? "paid" : "pending";
+              const paymentStatus = res ? "paid" : "pending";
               vm.$router.push({
                 name: "/paymentAfter",
                 params: { status: paymentStatus },
@@ -123,6 +123,7 @@ export default {
 <style>
 .payment {
   background-color: #eaeaea48;
+  height: 100vh;
   .van-loading {
     position: fixed;
     top: 50%;
