@@ -6,7 +6,7 @@ import { Toast } from "vant";
 // 創建實例
 const instance = axios.create({
   baseURL: "http://localhost:3008",
-  timeout: 5000,
+  timeout: 10000,
 });
 
 // 請求攔截器

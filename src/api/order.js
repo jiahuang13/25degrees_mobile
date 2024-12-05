@@ -44,3 +44,19 @@ export const getOrderStatusCountAPI = () => {
     url: "/order/status",
   });
 };
+
+// 取得銷售趨勢
+export const getSalesTrendAPI = (params) => {
+  return request({
+    url: "sales/trend",
+    params,
+  });
+};
+
+// 取得銷售排行
+export const getSalesRankingAPI = (params) => {
+  return request({
+    url: "sales/ranking",
+    params,
+  });
+};

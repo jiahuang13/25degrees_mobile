@@ -16,14 +16,21 @@
         name="password"
         type="password"
         placeholder="輸入新密碼"
-        :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
+        :rules="[
+          {
+            validator: validatorPassword,
+            message: '請輸入至少5位數字或英文字母',
+          },
+        ]"
       />
       <van-field
         v-model="form.confirmPassword"
         name="confirmPassword"
         type="password"
         placeholder="再次輸入新密碼"
-        :rules="[{ validator, message: '請輸入至少5位數字或英文字母' }]"
+        :rules="[
+          { validator: validatorConfirm, message: '密碼不一致，請重新輸入' },
+        ]"
       />
       <div style="margin: 16px">
         <van-button
@@ -56,6 +63,9 @@ export default {
       },
     };
   },
+  mounted() {
+    console.log(this.$route.params.email);
+  },
   methods: {
     async submit() {
       try {
@@ -72,8 +82,11 @@ export default {
         console.error(err);
       }
     },
-    validator(val) {
+    validatorPassword(val) {
       return /^[0-9a-zA-Z_]{5,}$/.test(val);
+    },
+    validatorConfirm(val) {
+      return val === this.form.password;
     },
   },
 };

@@ -21,8 +21,8 @@ export const getAllProductRandAPI = () => {
   });
 };
 
-// 搜索結果
-export const getSearchResultsAPI = (params) => {
+// 搜尋結果（前後台共用）
+export const searchProductAPI = (params) => {
   return request({
     url: "/api/product/search",
     params,
@@ -56,13 +56,5 @@ export const updateProductAPI = (data) => {
     url: "/admin/product",
     method: "PATCH",
     data,
-  });
-};
-
-// 後台搜尋商品
-export const searchProductAPI = (params) => {
-  return request({
-    url: "/product/search",
-    params,
   });
 };

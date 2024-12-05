@@ -14,7 +14,7 @@
           :unique-opened="true"
         >
           <!-- 菜单中的每一项 -->
-          <el-menu-item index="1" @click="$router.push('/admin/workbench')">
+          <el-menu-item index="1" @click="$router.push('/admin/dashboard')">
             <i class="el-icon-data-board"></i>
             <span slot="title">工作台</span>
           </el-menu-item>
@@ -34,7 +34,7 @@
             <span slot="title">會員管理</span>
           </el-menu-item>
 
-          <el-menu-item index="5" @click="$router.push('/admin/orders')">
+          <el-menu-item index="5" @click="$router.push('/admin/order')">
             <i class="el-icon-tickets"></i>
             <span slot="title">訂單管理</span>
           </el-menu-item>

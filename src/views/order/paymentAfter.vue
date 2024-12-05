@@ -69,28 +69,30 @@ export default {
     ...mapState("cart", ["list"]),
   },
   async mounted() {
-    // console.log(this.$route.params.status);
-    const status = this.$route.params.status;
-    if (status === "pending") {
-      this.status = "訂單待付款";
-      this.statusIcon = "warning";
-    } else if (status === "paid") {
-      this.status = "付款成功";
-      this.statusIcon = "passed";
-    } else {
-      console.log("路由參數異常");
-    }
-
-    try {
-      const res = await getAllProductRandAPI();
-      console.log(res);
-      this.suggestList = res.data;
-    } catch (err) {
-      console.log(err);
-    }
+    this.getSuggestList();
   },
   methods: {
-    statusMap() {},
+    async getSuggestList() {
+      // console.log(this.$route.params.status);
+      const status = this.$route.params.status;
+      if (status === "pending") {
+        this.status = "訂單待付款";
+        this.statusIcon = "warning";
+      } else if (status === "paid") {
+        this.status = "付款成功";
+        this.statusIcon = "passed";
+      } else {
+        console.log("路由參數異常");
+      }
+
+      try {
+        const res = await getAllProductRandAPI();
+        console.log(res);
+        this.suggestList = res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
 };
 </script>
@@ -102,7 +104,7 @@ export default {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    background: url("../assets/image/paymentAfter-bg2.jpg");
+    background: url("@/assets/image/paymentAfter-bg2.jpg");
     height: 30vh;
     text-align: center;
     .van-nav-bar {

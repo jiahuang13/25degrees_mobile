@@ -1,44 +1,22 @@
 export default {
   namespaced: true,
   state: {
-    searchHistory: [],
+    history: [],
   },
   getters: {},
   mutations: {
-    changeSearchHistory(state, keyword) {
-      if (state.searchHistory.includes(keyword)) {
-        const index = state.searchHistory.indexOf(keyword);
-        console.log(index);
-        state.searchHistory.splice(index, 1);
-        state.searchHistory.unshift(keyword);
-        localStorage.setItem(
-          "25dg_search",
-          JSON.stringify(state.searchHistory)
-        );
-      } else {
-        state.searchHistory.unshift(keyword);
-        localStorage.setItem(
-          "25dg_search",
-          JSON.stringify(state.searchHistory)
-        );
-      }
+    getHistory(state) {
+      state.history =
+        JSON.parse(localStorage.getItem("25degrees_search")) || [];
     },
-    updateSearchHistory(state, arr) {
-      state.searchHistory = arr;
-    },
-    clearHistory(state) {
-      state.searchHistory = [];
-    },
-  },
-  actions: {
-    getSearchHistory(context) {
-      if (JSON.parse(localStorage.getItem("25dg_search"))) {
-        const res = JSON.parse(localStorage.getItem("25dg_search"));
-        context.commit("updateSearchHistory", res);
-      } else {
-        // console.log("no hisotry");
-        return;
-      }
+    addHistory(state, keyword) {
+      // 移除重複項並將新項目放到最前面
+      state.history = [
+        keyword,
+        ...state.history.filter((item) => item !== keyword),
+      ];
+      // 儲存到 localStorage
+      localStorage.setItem("25degrees_search", JSON.stringify(state.history));
     },
   },
 };
